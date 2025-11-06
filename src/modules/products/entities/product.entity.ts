@@ -4,7 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { Category } from './category.entity';
 
 @Entity('products')
 export class Product {
@@ -20,11 +23,21 @@ export class Product {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @Column()
-  category: string;
-
+  // Category relationship
   @Column({ nullable: true })
-  subcategory: string;
+  categoryId: string;
+
+  @ManyToOne(() => Category, { nullable: true, eager: true })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
+
+  // Subcategory relationship
+  @Column({ nullable: true })
+  subcategoryId: string;
+
+  @ManyToOne(() => Category, { nullable: true, eager: true })
+  @JoinColumn({ name: 'subcategoryId' })
+  subcategory: Category;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
