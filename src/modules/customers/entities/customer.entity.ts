@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('customers')
@@ -37,6 +38,13 @@ export class Customer {
 
   @Column({ type: 'jsonb', nullable: true })
   preferences: any;
+
+  // Relations for purchase history
+  @OneToMany('Sale', 'customer')
+  sales: any[];
+
+  @OneToMany('Invoice', 'customer')
+  invoices: any[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
@@ -58,6 +59,13 @@ export class Branch {
     taxRate?: number;
     operatingHours?: Record<string, { open: string; close: string }>;
   };
+
+  // Relations for performance stats
+  @OneToMany('Sale', 'branch')
+  sales: any[];
+
+  @OneToMany('Invoice', 'branch')
+  invoices: any[];
 
   @CreateDateColumn()
   createdAt: Date;
