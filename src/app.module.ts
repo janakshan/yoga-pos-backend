@@ -19,7 +19,7 @@ import { BranchesModule } from './modules/branches/branches.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CustomersModule } from './modules/customers/customers.module';
 import { InventoryModule } from './modules/inventory/inventory.module';
-import { POSModule } from './modules/pos/pos.module';
+import { PosModule } from './modules/pos/pos.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
@@ -57,7 +57,7 @@ import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.
     ProductsModule,
     CustomersModule,
     InventoryModule,
-    POSModule,
+    PosModule,
     InvoicesModule,
     PaymentsModule,
     ExpensesModule,
