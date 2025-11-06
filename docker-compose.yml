@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yoga-pos-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: yoga_pos_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - yoga-pos-network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: yoga-pos-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@yoga-pos.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - '5050:80'
+    depends_on:
+      - postgres
+    networks:
+      - yoga-pos-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yoga-pos-api
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: yoga_pos_db
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - yoga-pos-network
+    command: npm run start:dev
+
+volumes:
+  postgres_data:
+
+networks:
+  yoga-pos-network:
+    driver: bridge
