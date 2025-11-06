@@ -14,7 +14,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto | any): Promise<User> {
-    const user = this.usersRepository.create(createUserDto);
+    const user = this.usersRepository.create(createUserDto) as any;
     return this.usersRepository.save(user);
   }
 
@@ -88,11 +88,11 @@ export class UsersService {
   }
 
   async updateRefreshToken(id: string, refreshToken: string | null): Promise<void> {
-    await this.usersRepository.update(id, { refreshToken });
+    await this.usersRepository.update(id, { refreshToken } as any);
   }
 
   async updatePin(id: string, pin: string | null): Promise<void> {
-    await this.usersRepository.update(id, { pin, pinAttempts: 0, pinLockedUntil: null });
+    await this.usersRepository.update(id, { pin, pinAttempts: 0, pinLockedUntil: null } as any);
   }
 
   async incrementPinAttempts(id: string): Promise<void> {
@@ -112,15 +112,15 @@ export class UsersService {
   }
 
   async resetPinAttempts(id: string): Promise<void> {
-    await this.usersRepository.update(id, { pinAttempts: 0, pinLockedUntil: null });
+    await this.usersRepository.update(id, { pinAttempts: 0, pinLockedUntil: null } as any);
   }
 
   async getStats(): Promise<any> {
     const [total, active, inactive, suspended] = await Promise.all([
       this.usersRepository.count(),
-      this.usersRepository.count({ where: { status: 'active' } }),
-      this.usersRepository.count({ where: { status: 'inactive' } }),
-      this.usersRepository.count({ where: { status: 'suspended' } }),
+      this.usersRepository.count({ where: { status: 'active' as any } }),
+      this.usersRepository.count({ where: { status: 'inactive' as any } }),
+      this.usersRepository.count({ where: { status: 'suspended' as any } }),
     ]);
 
     return {
