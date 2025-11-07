@@ -1,5 +1,9 @@
 import { DataSource } from 'typeorm';
-import { Setting } from '../../modules/settings/entities/setting.entity';
+import {
+  Setting,
+  SettingDataType,
+  SettingCategory,
+} from '../../modules/settings/entities/setting.entity';
 
 export async function seedSettings(dataSource: DataSource): Promise<void> {
   const settingRepository = dataSource.getRepository(Setting);
@@ -9,8 +13,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'app.name',
       value: 'Yoga POS',
-      dataType: 'string' as const,
-      category: 'general' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.GENERAL,
       label: 'Application Name',
       description: 'The name of the application',
       isPublic: true,
@@ -19,8 +23,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'app.timezone',
       value: 'America/Los_Angeles',
-      dataType: 'string' as const,
-      category: 'general' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.GENERAL,
       label: 'Timezone',
       description: 'Default timezone for the application',
       isPublic: true,
@@ -29,8 +33,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'app.language',
       value: 'en',
-      dataType: 'string' as const,
-      category: 'general' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.GENERAL,
       label: 'Default Language',
       description: 'Default language for the application',
       isPublic: true,
@@ -39,8 +43,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'app.currency',
       value: 'USD',
-      dataType: 'string' as const,
-      category: 'general' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.GENERAL,
       label: 'Currency',
       description: 'Default currency for transactions',
       isPublic: true,
@@ -51,8 +55,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'business.name',
       value: 'Yoga Studio & Wellness Center',
-      dataType: 'string' as const,
-      category: 'business' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.BUSINESS,
       label: 'Business Name',
       description: 'Official business name',
       isPublic: true,
@@ -61,8 +65,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'business.email',
       value: 'contact@yogastudio.com',
-      dataType: 'string' as const,
-      category: 'business' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.BUSINESS,
       label: 'Business Email',
       description: 'Primary business contact email',
       isPublic: true,
@@ -71,8 +75,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'business.phone',
       value: '+1-555-YOGA-123',
-      dataType: 'string' as const,
-      category: 'business' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.BUSINESS,
       label: 'Business Phone',
       description: 'Primary business contact phone',
       isPublic: true,
@@ -87,8 +91,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
         country: 'USA',
         postalCode: '90001',
       }),
-      dataType: 'json' as const,
-      category: 'business' as const,
+      dataType: SettingDataType.JSON,
+      category: SettingCategory.BUSINESS,
       label: 'Business Address',
       description: 'Physical business address',
       isPublic: true,
@@ -97,8 +101,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'business.tax_id',
       value: '12-3456789',
-      dataType: 'string' as const,
-      category: 'business' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.BUSINESS,
       label: 'Tax ID',
       description: 'Business tax identification number',
       isPublic: false,
@@ -109,8 +113,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'tax.default_rate',
       value: '8.25',
-      dataType: 'number' as const,
-      category: 'tax' as const,
+      dataType: SettingDataType.NUMBER,
+      category: SettingCategory.TAX,
       label: 'Default Tax Rate',
       description: 'Default tax rate percentage',
       isPublic: false,
@@ -119,8 +123,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'tax.inclusive',
       value: 'false',
-      dataType: 'boolean' as const,
-      category: 'tax' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.TAX,
       label: 'Tax Inclusive Pricing',
       description: 'Whether prices include tax',
       isPublic: false,
@@ -131,8 +135,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'payment.methods',
       value: JSON.stringify(['cash', 'card', 'bank_transfer', 'mobile_payment']),
-      dataType: 'array' as const,
-      category: 'payment' as const,
+      dataType: SettingDataType.ARRAY,
+      category: SettingCategory.PAYMENT,
       label: 'Enabled Payment Methods',
       description: 'List of enabled payment methods',
       isPublic: false,
@@ -141,8 +145,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'payment.default_method',
       value: 'cash',
-      dataType: 'string' as const,
-      category: 'payment' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.PAYMENT,
       label: 'Default Payment Method',
       description: 'Default payment method for transactions',
       isPublic: false,
@@ -153,8 +157,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'notification.email.enabled',
       value: 'true',
-      dataType: 'boolean' as const,
-      category: 'notification' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.NOTIFICATION,
       label: 'Email Notifications Enabled',
       description: 'Enable or disable email notifications',
       isPublic: false,
@@ -163,8 +167,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'notification.sms.enabled',
       value: 'false',
-      dataType: 'boolean' as const,
-      category: 'notification' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.NOTIFICATION,
       label: 'SMS Notifications Enabled',
       description: 'Enable or disable SMS notifications',
       isPublic: false,
@@ -173,8 +177,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'notification.push.enabled',
       value: 'true',
-      dataType: 'boolean' as const,
-      category: 'notification' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.NOTIFICATION,
       label: 'Push Notifications Enabled',
       description: 'Enable or disable push notifications',
       isPublic: false,
@@ -185,8 +189,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'hardware.receipt_printer.enabled',
       value: 'true',
-      dataType: 'boolean' as const,
-      category: 'hardware' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.HARDWARE,
       label: 'Receipt Printer Enabled',
       description: 'Enable or disable receipt printer',
       isPublic: false,
@@ -195,8 +199,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'hardware.barcode_scanner.enabled',
       value: 'true',
-      dataType: 'boolean' as const,
-      category: 'hardware' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.HARDWARE,
       label: 'Barcode Scanner Enabled',
       description: 'Enable or disable barcode scanner',
       isPublic: false,
@@ -205,8 +209,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'hardware.cash_drawer.enabled',
       value: 'true',
-      dataType: 'boolean' as const,
-      category: 'hardware' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.HARDWARE,
       label: 'Cash Drawer Enabled',
       description: 'Enable or disable cash drawer',
       isPublic: false,
@@ -217,8 +221,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'security.pin_length',
       value: '4',
-      dataType: 'number' as const,
-      category: 'security' as const,
+      dataType: SettingDataType.NUMBER,
+      category: SettingCategory.SECURITY,
       label: 'PIN Length',
       description: 'Required length for user PINs',
       isPublic: false,
@@ -227,8 +231,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'security.pin_max_attempts',
       value: '3',
-      dataType: 'number' as const,
-      category: 'security' as const,
+      dataType: SettingDataType.NUMBER,
+      category: SettingCategory.SECURITY,
       label: 'PIN Max Attempts',
       description: 'Maximum PIN entry attempts before lockout',
       isPublic: false,
@@ -237,8 +241,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'security.session_timeout',
       value: '3600',
-      dataType: 'number' as const,
-      category: 'security' as const,
+      dataType: SettingDataType.NUMBER,
+      category: SettingCategory.SECURITY,
       label: 'Session Timeout',
       description: 'Session timeout in seconds',
       isPublic: false,
@@ -249,8 +253,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'branding.logo_url',
       value: '/assets/logo.png',
-      dataType: 'string' as const,
-      category: 'branding' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.BRANDING,
       label: 'Logo URL',
       description: 'URL to the company logo',
       isPublic: true,
@@ -259,8 +263,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'branding.primary_color',
       value: '#6B46C1',
-      dataType: 'string' as const,
-      category: 'branding' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.BRANDING,
       label: 'Primary Color',
       description: 'Primary brand color (hex)',
       isPublic: true,
@@ -269,8 +273,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'branding.secondary_color',
       value: '#805AD5',
-      dataType: 'string' as const,
-      category: 'branding' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.BRANDING,
       label: 'Secondary Color',
       description: 'Secondary brand color (hex)',
       isPublic: true,
@@ -281,8 +285,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'integration.accounting.enabled',
       value: 'false',
-      dataType: 'boolean' as const,
-      category: 'integration' as const,
+      dataType: SettingDataType.BOOLEAN,
+      category: SettingCategory.INTEGRATION,
       label: 'Accounting Integration Enabled',
       description: 'Enable or disable accounting software integration',
       isPublic: false,
@@ -291,8 +295,8 @@ export async function seedSettings(dataSource: DataSource): Promise<void> {
     {
       key: 'integration.email.provider',
       value: 'smtp',
-      dataType: 'string' as const,
-      category: 'integration' as const,
+      dataType: SettingDataType.STRING,
+      category: SettingCategory.INTEGRATION,
       label: 'Email Provider',
       description: 'Email service provider',
       isPublic: false,
