@@ -42,17 +42,32 @@ export class Product {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   cost: number;
 
-  @Column({ type: 'int', default: 0 })
-  stockQuantity: number;
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  taxRate: number;
 
-  @Column({ type: 'int', default: 10 })
-  lowStockThreshold: number;
-
-  @Column({ default: 'piece' })
+  @Column({ nullable: true })
   unit: string;
+
+  @Column({ type: 'int', default: 0 })
+  reorderLevel: number;
+
+  @Column({ type: 'int', default: 0 })
+  reorderQuantity: number;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ default: false })
+  isFeatured: boolean;
+
+  @Column({ default: true })
+  trackInventory: boolean;
+
+  @Column({ default: false })
+  allowBackorder: boolean;
 
   @Column({ nullable: true })
   barcode: string;
@@ -61,37 +76,19 @@ export class Product {
   imageUrl: string;
 
   @Column({ type: 'jsonb', nullable: true })
-  imageUrls: string[];
-
-  @Column({ default: 'active' })
-  status: string;
+  images: any;
 
   @Column({ type: 'jsonb', nullable: true })
-  tags: string[];
+  attributes: any;
 
   @Column({ type: 'jsonb', nullable: true })
-  attributes: any[];
+  dimensions: any;
 
-  @Column({ default: true })
-  trackInventory: boolean;
-
-  @Column({ default: false })
-  allowBackorder: boolean;
-
-  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
-  taxRate: number;
-
-  @Column({ nullable: true })
-  supplier: string;
+  @Column({ type: 'jsonb', nullable: true })
+  seo: any;
 
   @Column({ name: 'supplier_id', nullable: true })
   supplierId: string;
-
-  @Column({ default: false })
-  isBundle: boolean;
-
-  @Column({ type: 'jsonb', nullable: true })
-  bundle: any;
 
   @Column({ type: 'jsonb', nullable: true })
   customFields: any;
