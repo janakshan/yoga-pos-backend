@@ -249,15 +249,40 @@ export async function seedCustomers(dataSource: DataSource): Promise<void> {
 
   for (const customerData of customers) {
     const existingCustomer = await customerRepository.findOne({
-      where: { code: customerData.code },
+      where: { email: (customerData as any).email },
     });
 
     if (!existingCustomer) {
-      const customer = customerRepository.create(customerData);
+      // Transform customer data to match entity
+      const {
+        code,
+        isActive,
+        dateOfBirth,
+        totalPurchases,
+        notes,
+        ...rest
+      } = customerData as any;
+
+      const transformedData: any = {
+        ...rest,
+        status: isActive ? 'active' : 'inactive',
+      };
+
+      // Add extra fields to preferences if they exist
+      if (dateOfBirth || totalPurchases || notes) {
+        transformedData.preferences = {
+          ...(transformedData.preferences || {}),
+          ...(dateOfBirth && { dateOfBirth }),
+          ...(totalPurchases && { totalPurchases }),
+          ...(notes && { notes }),
+        };
+      }
+
+      const customer = customerRepository.create(transformedData);
       await customerRepository.save(customer);
-      console.log(`✓ Created customer: ${customerData.firstName} ${customerData.lastName}`);
+      console.log(`✓ Created customer: ${(customerData as any).firstName} ${(customerData as any).lastName}`);
     } else {
-      console.log(`- Customer already exists: ${customerData.firstName} ${customerData.lastName}`);
+      console.log(`- Customer already exists: ${(customerData as any).firstName} ${(customerData as any).lastName}`);
     }
   }
 }

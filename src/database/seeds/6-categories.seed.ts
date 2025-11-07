@@ -7,43 +7,33 @@ export async function seedCategories(dataSource: DataSource): Promise<void> {
   // Main categories
   const mainCategories = [
     {
-      code: 'CAT001',
       name: 'Yoga Mats',
       description: 'High-quality yoga mats for all levels',
-      displayOrder: 1,
-      isActive: true,
+      sortOrder: 1,
       imageUrl: '/images/categories/yoga-mats.jpg',
     },
     {
-      code: 'CAT002',
       name: 'Yoga Apparel',
       description: 'Comfortable and stylish yoga clothing',
-      displayOrder: 2,
-      isActive: true,
+      sortOrder: 2,
       imageUrl: '/images/categories/apparel.jpg',
     },
     {
-      code: 'CAT003',
       name: 'Accessories',
       description: 'Essential yoga accessories and props',
-      displayOrder: 3,
-      isActive: true,
+      sortOrder: 3,
       imageUrl: '/images/categories/accessories.jpg',
     },
     {
-      code: 'CAT004',
       name: 'Meditation',
       description: 'Products for meditation and mindfulness',
-      displayOrder: 4,
-      isActive: true,
+      sortOrder: 4,
       imageUrl: '/images/categories/meditation.jpg',
     },
     {
-      code: 'CAT005',
       name: 'Wellness',
       description: 'Health and wellness products',
-      displayOrder: 5,
-      isActive: true,
+      sortOrder: 5,
       imageUrl: '/images/categories/wellness.jpg',
     },
   ];
@@ -52,7 +42,7 @@ export async function seedCategories(dataSource: DataSource): Promise<void> {
 
   for (const categoryData of mainCategories) {
     let category = await categoryRepository.findOne({
-      where: { code: categoryData.code },
+      where: { name: categoryData.name },
     });
 
     if (!category) {
@@ -63,99 +53,79 @@ export async function seedCategories(dataSource: DataSource): Promise<void> {
       console.log(`- Category already exists: ${categoryData.name}`);
     }
 
-    createdMainCategories[categoryData.code] = category;
+    createdMainCategories[categoryData.name] = category;
   }
 
   // Subcategories
   const subCategories = [
     {
-      code: 'CAT001-01',
       name: 'Premium Mats',
       description: 'High-end yoga mats with superior grip',
-      parentCode: 'CAT001',
-      displayOrder: 1,
-      isActive: true,
+      parentName: 'Yoga Mats',
+      sortOrder: 1,
     },
     {
-      code: 'CAT001-02',
       name: 'Travel Mats',
       description: 'Lightweight and portable yoga mats',
-      parentCode: 'CAT001',
-      displayOrder: 2,
-      isActive: true,
+      parentName: 'Yoga Mats',
+      sortOrder: 2,
     },
     {
-      code: 'CAT001-03',
       name: 'Eco-Friendly Mats',
       description: 'Sustainable and biodegradable yoga mats',
-      parentCode: 'CAT001',
-      displayOrder: 3,
-      isActive: true,
+      parentName: 'Yoga Mats',
+      sortOrder: 3,
     },
     {
-      code: 'CAT002-01',
       name: 'Women\'s Apparel',
       description: 'Yoga clothing for women',
-      parentCode: 'CAT002',
-      displayOrder: 1,
-      isActive: true,
+      parentName: 'Yoga Apparel',
+      sortOrder: 1,
     },
     {
-      code: 'CAT002-02',
       name: 'Men\'s Apparel',
       description: 'Yoga clothing for men',
-      parentCode: 'CAT002',
-      displayOrder: 2,
-      isActive: true,
+      parentName: 'Yoga Apparel',
+      sortOrder: 2,
     },
     {
-      code: 'CAT003-01',
       name: 'Blocks & Straps',
       description: 'Yoga blocks and straps for proper alignment',
-      parentCode: 'CAT003',
-      displayOrder: 1,
-      isActive: true,
+      parentName: 'Accessories',
+      sortOrder: 1,
     },
     {
-      code: 'CAT003-02',
       name: 'Bolsters & Blankets',
       description: 'Support props for restorative yoga',
-      parentCode: 'CAT003',
-      displayOrder: 2,
-      isActive: true,
+      parentName: 'Accessories',
+      sortOrder: 2,
     },
     {
-      code: 'CAT004-01',
       name: 'Meditation Cushions',
       description: 'Comfortable cushions for meditation practice',
-      parentCode: 'CAT004',
-      displayOrder: 1,
-      isActive: true,
+      parentName: 'Meditation',
+      sortOrder: 1,
     },
     {
-      code: 'CAT004-02',
       name: 'Incense & Candles',
       description: 'Aromatherapy for meditation',
-      parentCode: 'CAT004',
-      displayOrder: 2,
-      isActive: true,
+      parentName: 'Meditation',
+      sortOrder: 2,
     },
     {
-      code: 'CAT005-01',
       name: 'Supplements',
       description: 'Nutritional supplements for wellness',
-      parentCode: 'CAT005',
-      displayOrder: 1,
-      isActive: true,
+      parentName: 'Wellness',
+      sortOrder: 1,
     },
   ];
 
   for (const subCategoryData of subCategories) {
-    const { parentCode, ...categoryData } = subCategoryData;
-    const parent = createdMainCategories[parentCode];
+    const { parentName, ...categoryData } = subCategoryData;
+    const parent = createdMainCategories[parentName];
 
     const existingCategory = await categoryRepository.findOne({
-      where: { code: categoryData.code },
+      where: { name: categoryData.name },
     });
 
     if (!existingCategory) {

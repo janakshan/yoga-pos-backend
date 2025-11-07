@@ -8,17 +8,24 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
   const categoryRepository = dataSource.getRepository(Category);
   const supplierRepository = dataSource.getRepository(Supplier);
 
-  // Get categories
-  const premiumMatsCategory = await categoryRepository.findOne({ where: { code: 'CAT001-01' } });
-  const travelMatsCategory = await categoryRepository.findOne({ where: { code: 'CAT001-02' } });
-  const ecoMatsCategory = await categoryRepository.findOne({ where: { code: 'CAT001-03' } });
-  const womensApparelCategory = await categoryRepository.findOne({ where: { code: 'CAT002-01' } });
-  const mensApparelCategory = await categoryRepository.findOne({ where: { code: 'CAT002-02' } });
-  const blocksStrapsCategory = await categoryRepository.findOne({ where: { code: 'CAT003-01' } });
-  const bolstersCategory = await categoryRepository.findOne({ where: { code: 'CAT003-02' } });
-  const cushionsCategory = await categoryRepository.findOne({ where: { code: 'CAT004-01' } });
-  const incenseCategory = await categoryRepository.findOne({ where: { code: 'CAT004-02' } });
-  const supplementsCategory = await categoryRepository.findOne({ where: { code: 'CAT005-01' } });
+  // Get main categories
+  const yogaMatsCategory = await categoryRepository.findOne({ where: { name: 'Yoga Mats' } });
+  const yogaApparelCategory = await categoryRepository.findOne({ where: { name: 'Yoga Apparel' } });
+  const accessoriesCategory = await categoryRepository.findOne({ where: { name: 'Accessories' } });
+  const meditationCategory = await categoryRepository.findOne({ where: { name: 'Meditation' } });
+  const wellnessCategory = await categoryRepository.findOne({ where: { name: 'Wellness' } });
+
+  // Get subcategories
+  const premiumMatsCategory = await categoryRepository.findOne({ where: { name: 'Premium Mats' } });
+  const travelMatsCategory = await categoryRepository.findOne({ where: { name: 'Travel Mats' } });
+  const ecoMatsCategory = await categoryRepository.findOne({ where: { name: 'Eco-Friendly Mats' } });
+  const womensApparelCategory = await categoryRepository.findOne({ where: { name: 'Women\'s Apparel' } });
+  const mensApparelCategory = await categoryRepository.findOne({ where: { name: 'Men\'s Apparel' } });
+  const blocksStrapsCategory = await categoryRepository.findOne({ where: { name: 'Blocks & Straps' } });
+  const bolstersCategory = await categoryRepository.findOne({ where: { name: 'Bolsters & Blankets' } });
+  const cushionsCategory = await categoryRepository.findOne({ where: { name: 'Meditation Cushions' } });
+  const incenseCategory = await categoryRepository.findOne({ where: { name: 'Incense & Candles' } });
+  const supplementsCategory = await categoryRepository.findOne({ where: { name: 'Supplements' } });
 
   // Get suppliers
   const yogaEssentials = await supplierRepository.findOne({ where: { code: 'SUP001' } });
@@ -425,7 +432,50 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
     });
 
     if (!existingProduct) {
-      const product = productRepository.create(productData);
+      // Transform the product data to match the entity
+      const {
+        supplier: supplierEntity,
+        isActive,
+        isFeatured,
+        images,
+        reorderLevel,
+        reorderQuantity,
+        dimensions,
+        seo,
+        category,
+        subcategory,
+        ...rest
+      } = productData as any;
+
+      const transformedData: any = {
+        ...rest,
+        status: isActive ? 'active' : 'inactive',
+        imageUrls: images,
+        lowStockThreshold: reorderLevel,
+        supplierId: supplierEntity?.id,
+        supplier: supplierEntity?.name,
+      };
+
+      // Only add category if it exists
+      if (category) {
+        transformedData.category = category;
+      }
+
+      // Only add subcategory if it exists
+      if (subcategory) {
+        transformedData.subcategory = subcategory;
+      }
+
+      // Add dimensions and seo to customFields
+      if (dimensions || seo || isFeatured !== undefined) {
+        transformedData.customFields = {
+          ...(dimensions && { dimensions }),
+          ...(seo && { seo }),
+          ...(isFeatured !== undefined && { isFeatured }),
+        };
+      }
+
+      const product = productRepository.create(transformedData);
       await productRepository.save(product);
       console.log(`✓ Created product: ${productData.name}`);
     } else {
