@@ -28,6 +28,9 @@ import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { BackupModule } from './modules/backup/backup.module';
 import { SettingsModule } from './modules/settings/settings.module';
+import { ReportsModule } from './modules/reports/reports.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { ExportModule } from './modules/export/export.module';
 
 @Module({
   imports: [
@@ -69,6 +72,9 @@ import { SettingsModule } from './modules/settings/settings.module';
     NotificationsModule,
     BackupModule,
     SettingsModule,
+    ReportsModule,
+    AnalyticsModule,
+    ExportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
