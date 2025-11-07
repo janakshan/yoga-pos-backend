@@ -7,6 +7,7 @@ import { seedSuppliers } from './5-suppliers.seed';
 import { seedCategories } from './6-categories.seed';
 import { seedProducts } from './7-products.seed';
 import { seedCustomers } from './8-customers.seed';
+import { seedSettings } from './9-settings.seed';
 
 async function runSeeds() {
   console.log('🌱 Starting database seeding...\n');
@@ -47,6 +48,10 @@ async function runSeeds() {
 
     console.log('🛍️  Seeding Customers...');
     await seedCustomers(AppDataSource);
+    console.log('');
+
+    console.log('⚙️  Seeding Settings...');
+    await seedSettings(AppDataSource);
     console.log('');
 
     console.log('✅ Database seeding completed successfully!\n');
