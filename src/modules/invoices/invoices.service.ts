@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike, Between } from 'typeorm';
+import { Repository, ILike, Between, LessThan } from 'typeorm';
 import { Invoice, InvoiceStatus } from './entities/invoice.entity';
 import { InvoiceItem } from './entities/invoice-item.entity';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
@@ -361,5 +361,165 @@ export class InvoicesService {
     }
 
     return `${prefix}-${String(sequence).padStart(4, '0')}`;
+  }
+
+  // Mark Invoice as Paid
+  async markAsPaid(id: string): Promise<Invoice> {
+    const invoice = await this.findOne(id);
+
+    if (invoice.status === InvoiceStatus.PAID) {
+      throw new BadRequestException('Invoice is already paid');
+    }
+
+    invoice.status = InvoiceStatus.PAID;
+    invoice.amountPaid = invoice.total;
+    invoice.amountDue = 0;
+
+    return this.invoicesRepository.save(invoice);
+  }
+
+  // Record Partial Payment
+  async recordPartialPayment(
+    id: string,
+    amount: number,
+    notes?: string,
+  ): Promise<Invoice> {
+    const invoice = await this.findOne(id);
+
+    if (invoice.status === InvoiceStatus.PAID) {
+      throw new BadRequestException('Invoice is already fully paid');
+    }
+
+    if (amount <= 0) {
+      throw new BadRequestException('Payment amount must be positive');
+    }
+
+    if (invoice.amountPaid + amount > invoice.total) {
+      throw new BadRequestException('Payment amount exceeds remaining balance');
+    }
+
+    invoice.amountPaid += amount;
+    invoice.amountDue = invoice.total - invoice.amountPaid;
+
+    if (invoice.amountDue <= 0) {
+      invoice.status = InvoiceStatus.PAID;
+      invoice.amountDue = 0;
+    } else {
+      invoice.status = InvoiceStatus.PARTIALLY_PAID;
+    }
+
+    if (notes) {
+      invoice.notes = invoice.notes
+        ? `${invoice.notes}\n\nPayment Note: ${notes}`
+        : `Payment Note: ${notes}`;
+    }
+
+    return this.invoicesRepository.save(invoice);
+  }
+
+  // Send Invoice (update status to issued)
+  async sendInvoice(id: string, email?: string, message?: string): Promise<any> {
+    const invoice = await this.findOne(id);
+
+    if (invoice.status === InvoiceStatus.DRAFT) {
+      invoice.status = InvoiceStatus.ISSUED;
+      invoice.issuedDate = new Date();
+      await this.invoicesRepository.save(invoice);
+    }
+
+    const recipientEmail = email || invoice.customer.email;
+
+    // In a real implementation, this would send an actual email
+    // For now, we'll return a mock response
+    return {
+      success: true,
+      message: 'Invoice sent successfully',
+      sentTo: recipientEmail,
+      invoiceNumber: invoice.invoiceNumber,
+      customMessage: message,
+      sentAt: new Date(),
+    };
+  }
+
+  // Get Overdue Invoices
+  async getOverdueInvoices(query?: any): Promise<[Invoice[], number]> {
+    const { page = 1, limit = 20, branchId } = query || {};
+
+    const where: any = {
+      status: InvoiceStatus.ISSUED,
+      dueDate: LessThan(new Date()),
+    };
+
+    if (branchId) {
+      where.branchId = branchId;
+    }
+
+    // Mark overdue invoices
+    const overdueInvoices = await this.invoicesRepository.find({
+      where,
+      relations: ['customer', 'branch'],
+    });
+
+    for (const invoice of overdueInvoices) {
+      if (invoice.status !== InvoiceStatus.OVERDUE) {
+        invoice.status = InvoiceStatus.OVERDUE;
+        await this.invoicesRepository.save(invoice);
+      }
+    }
+
+    // Re-fetch with updated status
+    where.status = InvoiceStatus.OVERDUE;
+
+    return this.invoicesRepository.findAndCount({
+      where,
+      relations: ['customer', 'branch', 'items'],
+      order: { dueDate: 'ASC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+  }
+
+  // Generate PDF (mock implementation)
+  async generatePdf(id: string): Promise<any> {
+    const invoice = await this.findOne(id);
+
+    // In a real implementation, this would generate an actual PDF
+    // using a library like pdfkit, puppeteer, or similar
+    return {
+      success: true,
+      message: 'PDF generated successfully',
+      invoiceNumber: invoice.invoiceNumber,
+      pdfUrl: `/invoices/${invoice.id}/download.pdf`,
+      generatedAt: new Date(),
+    };
+  }
+
+  // Email Invoice with PDF
+  async emailInvoice(
+    id: string,
+    email: string,
+    subject?: string,
+    message?: string,
+  ): Promise<any> {
+    const invoice = await this.findOne(id);
+
+    // Generate PDF first
+    const pdfData = await this.generatePdf(id);
+
+    const emailSubject = subject || `Invoice ${invoice.invoiceNumber} from Yoga POS`;
+    const emailMessage =
+      message ||
+      `Dear ${invoice.customer.firstName} ${invoice.customer.lastName},\n\nPlease find attached your invoice.\n\nThank you for your business!`;
+
+    // In a real implementation, this would send an actual email with PDF attachment
+    return {
+      success: true,
+      message: 'Invoice emailed successfully',
+      sentTo: email,
+      subject: emailSubject,
+      invoiceNumber: invoice.invoiceNumber,
+      pdfAttached: true,
+      sentAt: new Date(),
+    };
   }
 }

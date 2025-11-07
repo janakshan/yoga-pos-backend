@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Branch } from './entities/branch.entity';
 import { CreateBranchDto } from './dto/create-branch.dto';
 import { UpdateBranchDto } from './dto/update-branch.dto';
@@ -13,12 +13,15 @@ import {
   UpdateOperatingHoursDto,
   UpdateBranchSettingsDto,
 } from './dto/update-operating-hours.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class BranchesService {
   constructor(
     @InjectRepository(Branch)
     private readonly branchRepository: Repository<Branch>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async create(createBranchDto: CreateBranchDto): Promise<Branch> {
@@ -325,5 +328,232 @@ export class BranchesService {
       branchesByCity,
       branchesByState,
     };
+  }
+
+  // Assign Manager to Branch
+  async assignManager(branchId: string, managerId: string): Promise<Branch> {
+    const branch = await this.findOne(branchId);
+
+    // Verify manager exists and has appropriate role
+    const manager = await this.userRepository.findOne({
+      where: { id: managerId },
+      relations: ['roles'],
+    });
+
+    if (!manager) {
+      throw new NotFoundException(`User with ID ${managerId} not found`);
+    }
+
+    // Check if user has manager or admin role
+    const hasManagerRole = manager.roles?.some(
+      (role) => role.code === 'manager' || role.code === 'admin',
+    );
+
+    if (!hasManagerRole) {
+      throw new BadRequestException('User does not have manager privileges');
+    }
+
+    branch.managerId = managerId;
+    branch.manager = manager;
+
+    return await this.branchRepository.save(branch);
+  }
+
+  // Bulk Status Update
+  async bulkStatusUpdate(
+    branchIds: string[],
+    isActive: boolean,
+  ): Promise<{ updated: number; branches: Branch[] }> {
+    const branches = await this.branchRepository.find({
+      where: { id: In(branchIds) },
+    });
+
+    if (branches.length === 0) {
+      throw new NotFoundException('No branches found with provided IDs');
+    }
+
+    // Update status for all branches
+    branches.forEach((branch) => {
+      branch.isActive = isActive;
+    });
+
+    const updatedBranches = await this.branchRepository.save(branches);
+
+    return {
+      updated: updatedBranches.length,
+      branches: updatedBranches,
+    };
+  }
+
+  // Get Consolidated Performance
+  async getPerformance(): Promise<any> {
+    const branches = await this.branchRepository.find({
+      relations: ['manager'],
+    });
+
+    const performanceData = await Promise.all(
+      branches.map(async (branch) => {
+        try {
+          const stats = await this.getBranchStats(branch.id);
+          return {
+            branchId: branch.id,
+            branchName: branch.name,
+            branchCode: branch.code,
+            isActive: branch.isActive,
+            manager: stats.manager,
+            performance: {
+              totalSales: stats.salesStats.totalSales,
+              totalRevenue: stats.salesStats.totalRevenue,
+              averageSaleValue: stats.salesStats.averageSaleValue,
+              totalInvoices: stats.invoiceStats.totalInvoices,
+              totalInvoiceAmount: stats.invoiceStats.totalInvoiceAmount,
+            },
+          };
+        } catch (error) {
+          return {
+            branchId: branch.id,
+            branchName: branch.name,
+            branchCode: branch.code,
+            isActive: branch.isActive,
+            manager: branch.manager
+              ? {
+                  id: branch.manager.id,
+                  name: `${branch.manager.firstName} ${branch.manager.lastName}`,
+                }
+              : null,
+            performance: {
+              totalSales: 0,
+              totalRevenue: 0,
+              averageSaleValue: 0,
+              totalInvoices: 0,
+              totalInvoiceAmount: 0,
+            },
+          };
+        }
+      }),
+    );
+
+    // Calculate aggregate metrics
+    const aggregateMetrics = performanceData.reduce(
+      (acc, branch) => ({
+        totalSales: acc.totalSales + branch.performance.totalSales,
+        totalRevenue: acc.totalRevenue + branch.performance.totalRevenue,
+        totalInvoices: acc.totalInvoices + branch.performance.totalInvoices,
+        totalInvoiceAmount:
+          acc.totalInvoiceAmount + branch.performance.totalInvoiceAmount,
+      }),
+      {
+        totalSales: 0,
+        totalRevenue: 0,
+        totalInvoices: 0,
+        totalInvoiceAmount: 0,
+      },
+    );
+
+    // Sort by revenue
+    performanceData.sort(
+      (a, b) => b.performance.totalRevenue - a.performance.totalRevenue,
+    );
+
+    return {
+      branches: performanceData,
+      aggregateMetrics,
+      totalBranches: branches.length,
+      activeBranches: branches.filter((b) => b.isActive).length,
+    };
+  }
+
+  // Compare Branches
+  async compareBranches(branchIds: string[]): Promise<any> {
+    const branches = await this.branchRepository.find({
+      where: { id: In(branchIds) },
+      relations: ['manager'],
+    });
+
+    if (branches.length < 2) {
+      throw new BadRequestException('At least 2 branches required for comparison');
+    }
+
+    const comparisonData = await Promise.all(
+      branches.map(async (branch) => {
+        try {
+          const stats = await this.getBranchStats(branch.id);
+          return {
+            branchId: branch.id,
+            branchName: branch.name,
+            branchCode: branch.code,
+            location: `${branch.city}, ${branch.state}`,
+            isActive: branch.isActive,
+            manager: stats.manager,
+            metrics: {
+              totalSales: stats.salesStats.totalSales,
+              totalRevenue: stats.salesStats.totalRevenue,
+              averageSaleValue: stats.salesStats.averageSaleValue,
+              totalInvoices: stats.invoiceStats.totalInvoices,
+              totalInvoiceAmount: stats.invoiceStats.totalInvoiceAmount,
+            },
+          };
+        } catch (error) {
+          return {
+            branchId: branch.id,
+            branchName: branch.name,
+            branchCode: branch.code,
+            location: `${branch.city}, ${branch.state}`,
+            isActive: branch.isActive,
+            manager: branch.manager
+              ? {
+                  id: branch.manager.id,
+                  name: `${branch.manager.firstName} ${branch.manager.lastName}`,
+                }
+              : null,
+            metrics: {
+              totalSales: 0,
+              totalRevenue: 0,
+              averageSaleValue: 0,
+              totalInvoices: 0,
+              totalInvoiceAmount: 0,
+            },
+          };
+        }
+      }),
+    );
+
+    // Calculate comparison insights
+    const revenues = comparisonData.map((b) => b.metrics.totalRevenue);
+    const maxRevenue = Math.max(...revenues);
+    const minRevenue = Math.min(...revenues);
+
+    return {
+      branches: comparisonData,
+      insights: {
+        topPerformer: comparisonData.find(
+          (b) => b.metrics.totalRevenue === maxRevenue,
+        ),
+        lowestPerformer: comparisonData.find(
+          (b) => b.metrics.totalRevenue === minRevenue,
+        ),
+        averageRevenue:
+          revenues.reduce((sum, val) => sum + val, 0) / revenues.length,
+        revenueDifference: maxRevenue - minRevenue,
+      },
+    };
+  }
+
+  // Clone Settings
+  async cloneSettings(
+    sourceBranchId: string,
+    targetBranchId: string,
+  ): Promise<Branch> {
+    const sourceBranch = await this.findOne(sourceBranchId);
+    const targetBranch = await this.findOne(targetBranchId);
+
+    if (!sourceBranch.settings) {
+      throw new BadRequestException('Source branch has no settings to clone');
+    }
+
+    // Clone settings (deep copy)
+    targetBranch.settings = JSON.parse(JSON.stringify(sourceBranch.settings));
+
+    return await this.branchRepository.save(targetBranch);
   }
 }

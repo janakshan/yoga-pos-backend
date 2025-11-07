@@ -353,7 +353,7 @@ export class ProductsService {
   }> {
     const { products, discountPercentage } = calculateBundleDto;
 
-    const productDetails = [];
+    const productDetails: any[] = [];
     let subtotal = 0;
 
     for (const item of products) {

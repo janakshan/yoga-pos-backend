@@ -23,6 +23,10 @@ import {
   UpdateOperatingHoursDto,
   UpdateBranchSettingsDto,
 } from './dto/update-operating-hours.dto';
+import { AssignManagerDto } from './dto/assign-manager.dto';
+import { BulkStatusUpdateDto } from './dto/bulk-status.dto';
+import { CompareBranchesDto } from './dto/compare-branches.dto';
+import { CloneSettingsDto } from './dto/clone-settings.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -166,5 +170,63 @@ export class BranchesController {
   @ApiResponse({ status: 404, description: 'Branch not found' })
   remove(@Param('id') id: string) {
     return this.branchesService.remove(id);
+  }
+
+  @Post(':id/manager')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Assign manager to branch' })
+  @ApiResponse({ status: 200, description: 'Manager assigned successfully' })
+  @ApiResponse({ status: 404, description: 'Branch or user not found' })
+  @ApiResponse({ status: 400, description: 'User does not have manager privileges' })
+  assignManager(
+    @Param('id') id: string,
+    @Body() assignManagerDto: AssignManagerDto,
+  ) {
+    return this.branchesService.assignManager(id, assignManagerDto.managerId);
+  }
+
+  @Post('bulk/status')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Bulk update branch status' })
+  @ApiResponse({ status: 200, description: 'Branches updated successfully' })
+  @ApiResponse({ status: 404, description: 'No branches found' })
+  bulkStatusUpdate(@Body() bulkStatusUpdateDto: BulkStatusUpdateDto) {
+    return this.branchesService.bulkStatusUpdate(
+      bulkStatusUpdateDto.branchIds,
+      bulkStatusUpdateDto.isActive,
+    );
+  }
+
+  @Get('performance')
+  @Roles('admin', 'manager')
+  @ApiOperation({ summary: 'Get consolidated performance for all branches' })
+  @ApiResponse({
+    status: 200,
+    description: 'Performance data retrieved successfully',
+  })
+  getPerformance() {
+    return this.branchesService.getPerformance();
+  }
+
+  @Post('compare')
+  @Roles('admin', 'manager')
+  @ApiOperation({ summary: 'Compare multiple branches' })
+  @ApiResponse({ status: 200, description: 'Comparison data retrieved successfully' })
+  @ApiResponse({ status: 400, description: 'At least 2 branches required' })
+  compareBranches(@Body() compareBranchesDto: CompareBranchesDto) {
+    return this.branchesService.compareBranches(compareBranchesDto.branchIds);
+  }
+
+  @Post('settings/clone')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Clone settings from one branch to another' })
+  @ApiResponse({ status: 200, description: 'Settings cloned successfully' })
+  @ApiResponse({ status: 404, description: 'Branch not found' })
+  @ApiResponse({ status: 400, description: 'Source branch has no settings' })
+  cloneSettings(@Body() cloneSettingsDto: CloneSettingsDto) {
+    return this.branchesService.cloneSettings(
+      cloneSettingsDto.sourceBranchId,
+      cloneSettingsDto.targetBranchId,
+    );
   }
 }
