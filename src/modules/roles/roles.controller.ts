@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { RolesService } from './roles.service';
+import { AssignPermissionsDto } from './dto/assign-permissions.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 
@@ -42,5 +43,15 @@ export class RolesController {
   @ApiOperation({ summary: 'Delete a role' })
   remove(@Param('id') id: string) {
     return this.rolesService.remove(id);
+  }
+
+  @Post(':id/permissions')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Assign permissions to a role' })
+  @ApiResponse({ status: 200, description: 'Permissions assigned successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request - Cannot modify system role or invalid permission IDs' })
+  @ApiResponse({ status: 404, description: 'Role or permissions not found' })
+  assignPermissions(@Param('id') id: string, @Body() assignPermissionsDto: AssignPermissionsDto) {
+    return this.rolesService.assignPermissions(id, assignPermissionsDto);
   }
 }

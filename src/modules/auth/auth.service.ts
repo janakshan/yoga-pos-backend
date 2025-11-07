@@ -153,6 +153,11 @@ export class AuthService {
     return { success: true, message: 'PIN disabled successfully' };
   }
 
+  async resetPinAttempts(userId: string) {
+    await this.usersService.resetPinAttempts(userId);
+    return { success: true, message: 'PIN attempts reset successfully' };
+  }
+
   private async generateTokens(user: User) {
     const payload = {
       sub: user.id,

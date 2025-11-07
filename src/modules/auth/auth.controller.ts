@@ -96,4 +96,15 @@ export class AuthController {
   disablePin(@CurrentUser() user: any) {
     return this.authService.disablePin(user.id);
   }
+
+  @Post('pin/reset-attempts')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Reset PIN lockout for a user (admin only)' })
+  @ApiResponse({ status: 200, description: 'PIN attempts reset successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiBody({ schema: { properties: { userId: { type: 'string', format: 'uuid' } } } })
+  resetPinAttempts(@Body('userId') userId: string) {
+    return this.authService.resetPinAttempts(userId);
+  }
 }

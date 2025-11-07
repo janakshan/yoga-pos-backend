@@ -1,9 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, In } from 'typeorm';
 import { User } from './entities/user.entity';
+import { Role } from '../roles/entities/role.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { BulkRolesUpdateDto } from './dto/bulk-roles.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -11,6 +13,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Role)
+    private rolesRepository: Repository<Role>,
   ) {}
 
   async create(createUserDto: CreateUserDto | any): Promise<User> {
@@ -128,6 +132,48 @@ export class UsersService {
       activeUsers: active,
       inactiveUsers: inactive,
       suspendedUsers: suspended,
+    };
+  }
+
+  async bulkUpdateRoles(bulkRolesDto: BulkRolesUpdateDto): Promise<{
+    updated: number;
+    userIds: string[];
+  }> {
+    const { userIds, roleIds } = bulkRolesDto;
+
+    // Validate users exist
+    const users = await this.usersRepository.findBy({
+      id: In(userIds),
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException('No users found with the provided IDs');
+    }
+
+    // Validate roles exist
+    const roles = await this.rolesRepository.findBy({
+      id: In(roleIds),
+    });
+
+    if (roles.length === 0) {
+      throw new BadRequestException('No roles found with the provided IDs');
+    }
+
+    if (roles.length !== roleIds.length) {
+      throw new BadRequestException('Some role IDs are invalid');
+    }
+
+    // Update roles for all users
+    const updatedUserIds: string[] = [];
+    for (const user of users) {
+      user.roles = roles;
+      await this.usersRepository.save(user);
+      updatedUserIds.push(user.id);
+    }
+
+    return {
+      updated: updatedUserIds.length,
+      userIds: updatedUserIds,
     };
   }
 }
