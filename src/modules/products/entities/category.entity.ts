@@ -17,21 +17,23 @@ export class Category {
   @Column()
   name: string;
 
+  @Column()
+  code: string;
+
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ nullable: true, name: 'parent_id' })
+  parentId: string;
+
+  @Column({ type: 'int', nullable: true })
+  displayOrder: number;
+
+  @Column({ default: true })
+  isActive: boolean;
+
   @Column({ nullable: true })
   imageUrl: string;
-
-  @Column({ default: 'active' })
-  status: string;
-
-  @Column({ type: 'int', default: 0 })
-  sortOrder: number;
-
-  // Self-referencing for subcategories
-  @Column({ nullable: true })
-  parentId: string;
 
   @ManyToOne(() => Category, (category) => category.subcategories, {
     nullable: true,
