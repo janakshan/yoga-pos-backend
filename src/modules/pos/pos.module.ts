@@ -6,6 +6,7 @@ import { Sale } from './entities/sale.entity';
 import { SaleItem } from './entities/sale-item.entity';
 import { Product } from '../products/entities/product.entity';
 import { InventoryTransaction } from '../inventory/entities/inventory-transaction.entity';
+import { Payment } from '../payments/entities/payment.entity';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { InventoryTransaction } from '../inventory/entities/inventory-transactio
       SaleItem,
       Product,
       InventoryTransaction,
+      Payment,
     ]),
   ],
   controllers: [PosController],
