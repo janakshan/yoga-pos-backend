@@ -75,13 +75,13 @@ export class PurchaseOrder {
   terms: string;
 
   @Column({ nullable: true })
-  approvedBy: string;
+  approvedBy?: string;
 
   @Column({ type: 'timestamp', nullable: true })
   approvedAt: Date;
 
   @Column({ nullable: true })
-  receivedBy: string;
+  receivedBy?: string;
 
   @Column({ type: 'timestamp', nullable: true })
   receivedAt: Date;
