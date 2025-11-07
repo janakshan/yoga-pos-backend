@@ -70,14 +70,6 @@ export class InventoryController {
     return this.inventoryService.findAllStockLevels(query);
   }
 
-  @Get('stock-levels/:productId')
-  async findStockLevelByProduct(
-    @Param('productId') productId: string,
-    @Query('locationId') locationId?: string,
-  ) {
-    return this.inventoryService.findStockLevelByProduct(productId, locationId);
-  }
-
   @Get('stock-levels/low')
   async getLowStockProducts() {
     return this.inventoryService.getLowStockProducts();
@@ -86,6 +78,14 @@ export class InventoryController {
   @Get('stock-levels/out')
   async getOutOfStockProducts() {
     return this.inventoryService.getOutOfStockProducts();
+  }
+
+  @Get('stock-levels/:productId')
+  async findStockLevelByProduct(
+    @Param('productId') productId: string,
+    @Query('locationId') locationId?: string,
+  ) {
+    return this.inventoryService.findStockLevelByProduct(productId, locationId);
   }
 
   // Inventory Adjustments
