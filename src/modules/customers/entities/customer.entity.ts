@@ -51,6 +51,15 @@ export class Customer {
   @Column({ type: 'text', nullable: true })
   notes: string;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  creditBalance: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  creditLimit: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  storeCreditBalance: number;
+
   // Relations for purchase history
   @OneToMany('Sale', 'customer')
   sales: any[];
