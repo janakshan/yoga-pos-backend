@@ -25,6 +25,9 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { ExpensesModule } from './modules/expenses/expenses.module';
 import { SuppliersModule } from './modules/suppliers/suppliers.module';
 import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { BackupModule } from './modules/backup/backup.module';
+import { SettingsModule } from './modules/settings/settings.module';
 
 @Module({
   imports: [
@@ -63,6 +66,9 @@ import { PurchaseOrdersModule } from './modules/purchase-orders/purchase-orders.
     ExpensesModule,
     SuppliersModule,
     PurchaseOrdersModule,
+    NotificationsModule,
+    BackupModule,
+    SettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
