@@ -29,6 +29,9 @@ export class Category {
   @Column({ type: 'int', nullable: true })
   displayOrder: number;
 
+  @Column({ type: 'int', nullable: true })
+  sortOrder: number;
+
   @Column({ default: true })
   isActive: boolean;
 

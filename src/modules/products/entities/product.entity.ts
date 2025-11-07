@@ -52,6 +52,9 @@ export class Product {
   unit: string;
 
   @Column({ type: 'int', default: 0 })
+  stockQuantity: number;
+
+  @Column({ type: 'int', default: 0 })
   reorderLevel: number;
 
   @Column({ type: 'int', default: 0 })

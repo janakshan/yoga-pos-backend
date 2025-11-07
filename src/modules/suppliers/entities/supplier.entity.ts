@@ -47,8 +47,14 @@ export class Supplier {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ type: 'varchar', default: 'active' })
+  status: string;
+
   @Column({ type: 'decimal', precision: 3, scale: 1, nullable: true })
   rating: number;
+
+  @Column({ type: 'decimal', precision: 3, scale: 1, nullable: true })
+  averageRating: number;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   totalPurchased: number;
@@ -56,8 +62,20 @@ export class Supplier {
   @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
   totalOwed: number;
 
+  @Column({ type: 'decimal', precision: 12, scale: 2, default: 0 })
+  totalSpent: number;
+
+  @Column({ type: 'int', default: 0 })
+  totalOrders: number;
+
   @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
   averageDeliveryDays: number;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true })
+  onTimeDeliveryRate: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastOrderDate: Date;
 
   @Column({ type: 'text', nullable: true })
   notes: string;

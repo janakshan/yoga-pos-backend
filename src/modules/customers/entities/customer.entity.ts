@@ -42,6 +42,12 @@ export class Customer {
   @Column({ default: true })
   isActive: boolean;
 
+  @Column({ type: 'varchar', nullable: true })
+  customerType: string;
+
+  @Column({ type: 'varchar', default: 'active' })
+  status: string;
+
   @Column({ type: 'text', nullable: true })
   notes: string;
 
