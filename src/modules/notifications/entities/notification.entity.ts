@@ -84,10 +84,10 @@ export class Notification {
   };
 
   @Column({ type: 'timestamp', nullable: true })
-  scheduledFor: Date;
+  scheduledFor: Date | null;
 
   @Column({ type: 'timestamp', nullable: true })
-  sentAt: Date;
+  sentAt: Date | null;
 
   @Column({ type: 'text', nullable: true })
   errorMessage: string;
