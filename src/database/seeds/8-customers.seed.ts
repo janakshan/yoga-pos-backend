@@ -253,32 +253,7 @@ export async function seedCustomers(dataSource: DataSource): Promise<void> {
     });
 
     if (!existingCustomer) {
-      // Transform customer data to match entity
-      const {
-        code,
-        isActive,
-        dateOfBirth,
-        totalPurchases,
-        notes,
-        ...rest
-      } = customerData as any;
-
-      const transformedData: any = {
-        ...rest,
-        status: isActive ? 'active' : 'inactive',
-      };
-
-      // Add extra fields to preferences if they exist
-      if (dateOfBirth || totalPurchases || notes) {
-        transformedData.preferences = {
-          ...(transformedData.preferences || {}),
-          ...(dateOfBirth && { dateOfBirth }),
-          ...(totalPurchases && { totalPurchases }),
-          ...(notes && { notes }),
-        };
-      }
-
-      const customer = customerRepository.create(transformedData);
+      const customer = customerRepository.create(customerData);
       await customerRepository.save(customer);
       console.log(`✓ Created customer: ${(customerData as any).firstName} ${(customerData as any).lastName}`);
     } else {

@@ -41,7 +41,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Premium 6mm yoga mat with excellent grip and cushioning. Perfect for all yoga styles.',
       category: premiumMatsCategory,
       subcategory: premiumMatsCategory,
-      supplier: yogaEssentials,
+      supplierId: yogaEssentials?.id,
       barcode: '1234567890123',
       price: 89.99,
       cost: 45.00,
@@ -81,7 +81,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Premium 6mm yoga mat in vibrant purple color with superior grip.',
       category: premiumMatsCategory,
       subcategory: premiumMatsCategory,
-      supplier: yogaEssentials,
+      supplierId: yogaEssentials?.id,
       barcode: '1234567890124',
       price: 89.99,
       cost: 45.00,
@@ -116,7 +116,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Ultra-lightweight foldable yoga mat perfect for travelers. Only 1.5mm thick.',
       category: travelMatsCategory,
       subcategory: travelMatsCategory,
-      supplier: yogaEssentials,
+      supplierId: yogaEssentials?.id,
       barcode: '1234567890125',
       price: 49.99,
       cost: 25.00,
@@ -152,7 +152,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Sustainable yoga mat made from natural cork and recycled rubber.',
       category: ecoMatsCategory,
       subcategory: ecoMatsCategory,
-      supplier: yogaEssentials,
+      supplierId: yogaEssentials?.id,
       barcode: '1234567890126',
       price: 99.99,
       cost: 55.00,
@@ -188,7 +188,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Comfortable high-waist leggings with moisture-wicking fabric.',
       category: womensApparelCategory,
       subcategory: womensApparelCategory,
-      supplier: mindfulApparel,
+      supplierId: mindfulApparel?.id,
       barcode: '2234567890123',
       price: 59.99,
       cost: 30.00,
@@ -214,7 +214,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Supportive sports bra with adjustable straps and removable padding.',
       category: womensApparelCategory,
       subcategory: womensApparelCategory,
-      supplier: mindfulApparel,
+      supplierId: mindfulApparel?.id,
       barcode: '2234567890124',
       price: 39.99,
       cost: 20.00,
@@ -241,7 +241,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Breathable yoga shorts with built-in compression layer.',
       category: mensApparelCategory,
       subcategory: mensApparelCategory,
-      supplier: mindfulApparel,
+      supplierId: mindfulApparel?.id,
       barcode: '2234567890125',
       price: 44.99,
       cost: 22.00,
@@ -268,7 +268,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Natural cork yoga blocks for support and alignment. Set of 2.',
       category: blocksStrapsCategory,
       subcategory: blocksStrapsCategory,
-      supplier: zenEquipment,
+      supplierId: zenEquipment?.id,
       barcode: '3234567890123',
       price: 24.99,
       cost: 12.00,
@@ -293,7 +293,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Durable cotton yoga strap with D-ring buckle. 8 feet long.',
       category: blocksStrapsCategory,
       subcategory: blocksStrapsCategory,
-      supplier: zenEquipment,
+      supplierId: zenEquipment?.id,
       barcode: '3234567890124',
       price: 14.99,
       cost: 7.00,
@@ -320,7 +320,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Firm rectangular bolster for restorative yoga and meditation.',
       category: bolstersCategory,
       subcategory: bolstersCategory,
-      supplier: zenEquipment,
+      supplierId: zenEquipment?.id,
       barcode: '3234567890125',
       price: 69.99,
       cost: 35.00,
@@ -348,7 +348,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Traditional round meditation cushion filled with buckwheat hulls.',
       category: cushionsCategory,
       subcategory: cushionsCategory,
-      supplier: zenEquipment,
+      supplierId: zenEquipment?.id,
       barcode: '4234567890123',
       price: 54.99,
       cost: 28.00,
@@ -376,7 +376,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Natural lavender incense sticks for relaxation and meditation.',
       category: incenseCategory,
       subcategory: incenseCategory,
-      supplier: holisticHealth,
+      supplierId: holisticHealth?.id,
       barcode: '5234567890123',
       price: 19.99,
       cost: 8.00,
@@ -403,7 +403,7 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
       description: 'Organic turmeric supplement with black pepper for enhanced absorption. 60 capsules.',
       category: supplementsCategory,
       subcategory: supplementsCategory,
-      supplier: holisticHealth,
+      supplierId: holisticHealth?.id,
       barcode: '6234567890123',
       price: 29.99,
       cost: 15.00,
@@ -432,50 +432,15 @@ export async function seedProducts(dataSource: DataSource): Promise<void> {
     });
 
     if (!existingProduct) {
-      // Transform the product data to match the entity
-      const {
-        supplier: supplierEntity,
-        isActive,
-        isFeatured,
-        images,
-        reorderLevel,
-        reorderQuantity,
-        dimensions,
-        seo,
-        category,
-        subcategory,
-        ...rest
-      } = productData as any;
+      // Filter out null values and convert to undefined for TypeORM
+      const cleanedData = Object.entries(productData).reduce((acc, [key, value]) => {
+        if (value !== null) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any);
 
-      const transformedData: any = {
-        ...rest,
-        status: isActive ? 'active' : 'inactive',
-        imageUrls: images,
-        lowStockThreshold: reorderLevel,
-        supplierId: supplierEntity?.id,
-        supplier: supplierEntity?.name,
-      };
-
-      // Only add category if it exists
-      if (category) {
-        transformedData.category = category;
-      }
-
-      // Only add subcategory if it exists
-      if (subcategory) {
-        transformedData.subcategory = subcategory;
-      }
-
-      // Add dimensions and seo to customFields
-      if (dimensions || seo || isFeatured !== undefined) {
-        transformedData.customFields = {
-          ...(dimensions && { dimensions }),
-          ...(seo && { seo }),
-          ...(isFeatured !== undefined && { isFeatured }),
-        };
-      }
-
-      const product = productRepository.create(transformedData);
+      const product = productRepository.create(cleanedData);
       await productRepository.save(product);
       console.log(`✓ Created product: ${productData.name}`);
     } else {
