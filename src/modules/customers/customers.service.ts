@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Customer } from './entities/customer.entity';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -13,6 +13,7 @@ import {
   UpdateLoyaltyPointsDto,
   UpdateLoyaltyTierDto,
 } from './dto/update-loyalty.dto';
+import { BulkStatusUpdateDto, UpdatePurchaseStatsDto } from './dto/bulk-operations.dto';
 
 @Injectable()
 export class CustomersService {
@@ -342,5 +343,99 @@ export class CustomersService {
       customersByType,
       customersByTier,
     };
+  }
+
+  // Update purchase stats
+  async updatePurchaseStats(id: string, updateStatsDto: UpdatePurchaseStatsDto): Promise<Customer> {
+    const customer = await this.findOne(id);
+
+    const currentTotal = Number(customer.totalPurchases) || 0;
+    customer.totalPurchases = currentTotal + Number(updateStatsDto.purchaseAmount);
+
+    return await this.customerRepository.save(customer);
+  }
+
+  // Bulk status update
+  async bulkUpdateStatus(bulkUpdateDto: BulkStatusUpdateDto): Promise<{
+    updated: number;
+    customerIds: string[];
+  }> {
+    const customers = await this.customerRepository.findBy({
+      id: In(bulkUpdateDto.customerIds),
+    });
+
+    if (customers.length === 0) {
+      throw new BadRequestException('No valid customer IDs provided');
+    }
+
+    // Update all customers
+    await this.customerRepository.update(
+      { id: In(bulkUpdateDto.customerIds) },
+      { status: bulkUpdateDto.status }
+    );
+
+    return {
+      updated: customers.length,
+      customerIds: customers.map(c => c.id),
+    };
+  }
+
+  // Get detailed purchase statistics
+  async getDetailedPurchaseStats(customerId: string): Promise<any> {
+    const customer = await this.findOne(customerId);
+
+    try {
+      // Try to get detailed stats with relations
+      const purchaseData = await this.customerRepository
+        .createQueryBuilder('customer')
+        .leftJoin('customer.sales', 'sales')
+        .where('customer.id = :id', { id: customerId })
+        .select([
+          'COUNT(DISTINCT sales.id) as totalOrders',
+          'COALESCE(SUM(sales.total), 0) as totalSpent',
+          'COALESCE(AVG(sales.total), 0) as averageOrderValue',
+          'COALESCE(MAX(sales.total), 0) as largestPurchase',
+          'COALESCE(MIN(sales.total), 0) as smallestPurchase',
+          'MAX(sales.createdAt) as lastPurchaseDate',
+        ])
+        .getRawOne();
+
+      return {
+        customerId: customer.id,
+        customerName: `${customer.firstName} ${customer.lastName}`,
+        stats: {
+          totalOrders: parseInt(purchaseData.totalOrders) || 0,
+          totalSpent: parseFloat(purchaseData.totalSpent) || 0,
+          averageOrderValue: parseFloat(purchaseData.averageOrderValue) || 0,
+          largestPurchase: parseFloat(purchaseData.largestPurchase) || 0,
+          smallestPurchase: parseFloat(purchaseData.smallestPurchase) || 0,
+          lastPurchaseDate: purchaseData.lastPurchaseDate,
+          lifetimeValue: parseFloat(purchaseData.totalSpent) || 0,
+          customerSince: customer.createdAt,
+        },
+        loyaltyInfo: customer.loyaltyInfo,
+        creditBalance: customer.creditBalance,
+        storeCreditBalance: customer.storeCreditBalance,
+      };
+    } catch (error) {
+      // If relations don't exist yet, return basic stats
+      return {
+        customerId: customer.id,
+        customerName: `${customer.firstName} ${customer.lastName}`,
+        stats: {
+          totalOrders: 0,
+          totalSpent: 0,
+          averageOrderValue: 0,
+          largestPurchase: 0,
+          smallestPurchase: 0,
+          lastPurchaseDate: null,
+          lifetimeValue: 0,
+          customerSince: customer.createdAt,
+        },
+        loyaltyInfo: customer.loyaltyInfo,
+        creditBalance: customer.creditBalance,
+        storeCreditBalance: customer.storeCreditBalance,
+      };
+    }
   }
 }
