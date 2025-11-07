@@ -13,6 +13,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { BulkRolesUpdateDto } from './dto/bulk-roles.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -83,5 +84,15 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Post('bulk/roles')
+  @Roles('admin', 'manager')
+  @ApiOperation({ summary: 'Bulk update user roles' })
+  @ApiResponse({ status: 200, description: 'User roles updated successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request - Invalid role IDs' })
+  @ApiResponse({ status: 404, description: 'No users found with provided IDs' })
+  bulkUpdateRoles(@Body() bulkRolesDto: BulkRolesUpdateDto) {
+    return this.usersService.bulkUpdateRoles(bulkRolesDto);
   }
 }
