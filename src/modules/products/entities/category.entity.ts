@@ -39,7 +39,7 @@ export class Category {
     nullable: true,
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'parentId' })
+  @JoinColumn({ name: 'parent_id' })
   parent: Category;
 
   @OneToMany(() => Category, (category) => category.parent)
