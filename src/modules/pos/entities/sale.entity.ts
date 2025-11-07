@@ -93,6 +93,12 @@ export class Sale {
   @Column({ type: 'jsonb', nullable: true })
   metadata: any;
 
+  @Column({ type: 'boolean', default: false })
+  isHeld: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  heldAt: Date;
+
   @CreateDateColumn()
   createdAt: Date;
 
