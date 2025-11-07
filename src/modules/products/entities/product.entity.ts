@@ -42,13 +42,6 @@ export class Product {
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   price: number;
 
-  @Column({ type: 'jsonb', nullable: true })
-  pricing: {
-    retail: number;
-    wholesale: number;
-    member: number;
-  };
-
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   cost: number;
 
