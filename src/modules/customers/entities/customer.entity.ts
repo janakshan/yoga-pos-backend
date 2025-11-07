@@ -12,32 +12,38 @@ export class Customer {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ unique: true })
+  code: string;
+
   @Column()
   firstName: string;
 
-  @Column()
+  @Column({ nullable: true })
   lastName: string;
 
-  @Column({ unique: true })
+  @Column({ unique: true, nullable: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true })
   phone: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  dateOfBirth: Date;
 
   @Column({ type: 'jsonb', nullable: true })
   address: any;
 
-  @Column({ default: 'regular' })
-  customerType: string;
-
-  @Column({ default: 'active' })
-  status: string;
-
   @Column({ type: 'jsonb', nullable: true })
   loyaltyInfo: any;
 
-  @Column({ type: 'jsonb', nullable: true })
-  preferences: any;
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  totalPurchases: number;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column({ type: 'text', nullable: true })
+  notes: string;
 
   // Relations for purchase history
   @OneToMany('Sale', 'customer')
