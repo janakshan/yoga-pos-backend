@@ -24,19 +24,19 @@ export class Product {
   description: string;
 
   // Category relationship
-  @Column({ nullable: true })
+  @Column({ name: 'category_id', nullable: true })
   categoryId: string;
 
   @ManyToOne(() => Category, { nullable: true, eager: true })
-  @JoinColumn({ name: 'categoryId' })
+  @JoinColumn({ name: 'category_id' })
   category: Category;
 
   // Subcategory relationship
-  @Column({ nullable: true })
+  @Column({ name: 'subcategory_id', nullable: true })
   subcategoryId: string;
 
   @ManyToOne(() => Category, { nullable: true, eager: true })
-  @JoinColumn({ name: 'subcategoryId' })
+  @JoinColumn({ name: 'subcategory_id' })
   subcategory: Category;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
@@ -91,7 +91,7 @@ export class Product {
   @Column({ nullable: true })
   supplier: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'supplier_id', nullable: true })
   supplierId: string;
 
   @Column({ default: false })
