@@ -30,7 +30,7 @@ export class Branch {
   @Column()
   state: string;
 
-  @Column()
+  @Column({ name: 'postalCode' })
   zipCode: string;
 
   @Column()
