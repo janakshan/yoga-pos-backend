@@ -87,7 +87,7 @@ export class Expense {
   approvedByUser: User;
 
   @Column({ name: 'approved_by', nullable: true })
-  approvedBy: string;
+  approvedBy?: string;
 
   @Column({ nullable: true })
   approvedByName: string;

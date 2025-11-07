@@ -10,7 +10,11 @@ import { SaleItem } from './entities/sale-item.entity';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { Product } from '../products/entities/product.entity';
-import { InventoryTransaction } from '../inventory/entities/inventory-transaction.entity';
+import {
+  InventoryTransaction,
+  TransactionType,
+  TransactionStatus,
+} from '../inventory/entities/inventory-transaction.entity';
 
 @Injectable()
 export class PosService {
@@ -126,13 +130,13 @@ export class PosService {
         // Create inventory transaction
         const inventoryTransaction = this.inventoryRepository.create({
           productId: itemData.productId,
-          type: 'sale',
+          type: TransactionType.SALE,
           quantity: -itemData.quantity,
           unitCost: product.cost,
           totalCost: Number(product.cost) * itemData.quantity,
           referenceType: 'sale',
           referenceId: savedSale.id,
-          status: 'completed',
+          status: TransactionStatus.COMPLETED,
           transactionDate: new Date(),
         });
         await this.inventoryRepository.save(inventoryTransaction);
