@@ -16,6 +16,13 @@ export enum SettingCategory {
   TAX = 'tax',
   SECURITY = 'security',
   INTEGRATION = 'integration',
+  RESTAURANT = 'restaurant',
+}
+
+export enum BusinessType {
+  RETAIL = 'retail',
+  RESTAURANT = 'restaurant',
+  HYBRID = 'hybrid',
 }
 
 export enum SettingDataType {
@@ -70,6 +77,41 @@ export class Setting {
     options?: any[]; // For select/dropdown type settings
     min?: number;
     max?: number;
+    [key: string]: any;
+  };
+
+  @Column({
+    type: 'enum',
+    enum: BusinessType,
+    default: BusinessType.RETAIL,
+    nullable: true,
+  })
+  businessType: BusinessType;
+
+  @Column({ type: 'jsonb', nullable: true })
+  restaurantSettings: {
+    diningEnabled?: boolean;
+    takeawayEnabled?: boolean;
+    deliveryEnabled?: boolean;
+    tableManagement?: {
+      enabled: boolean;
+      maxTables?: number;
+      tablePrefix?: string;
+    };
+    kitchenDisplay?: {
+      enabled: boolean;
+      orderTicketPrinting?: boolean;
+    };
+    menuManagement?: {
+      categoriesEnabled: boolean;
+      modifiersEnabled: boolean;
+      comboMealsEnabled: boolean;
+    };
+    orderingFlow?: {
+      requireTableNumber: boolean;
+      allowSplitBills: boolean;
+      allowCourseTiming: boolean;
+    };
     [key: string]: any;
   };
 

@@ -5,11 +5,18 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { Setting, SettingCategory } from './entities/setting.entity';
+import { Setting, SettingCategory, BusinessType, SettingDataType } from './entities/setting.entity';
 import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { UpdateSettingValueDto } from './dto/update-setting-value.dto';
 import { BulkUpdateSettingsDto } from './dto/bulk-update-settings.dto';
+import {
+  RestaurantSettingsDto,
+  UpdateBusinessTypeDto,
+  UpdateRestaurantSettingsDto,
+  RestaurantConfigurationDto,
+} from './dto/restaurant-settings.dto';
+import { DEFAULT_RESTAURANT_SETTINGS } from '../restaurant/common/restaurant.constants';
 
 @Injectable()
 export class SettingsService {
@@ -237,6 +244,224 @@ export class SettingsService {
         const setting = this.settingsRepository.create(defaultSetting as any);
         await this.settingsRepository.save(setting);
       }
+    }
+  }
+
+  // ============================================================================
+  // Restaurant Mode Methods
+  // ============================================================================
+
+  /**
+   * Get the current business type
+   */
+  async getBusinessType(): Promise<BusinessType> {
+    try {
+      const setting = await this.findByKey('business_type');
+      return setting.value as BusinessType;
+    } catch (error) {
+      return BusinessType.RETAIL; // Default to retail if not set
+    }
+  }
+
+  /**
+   * Update the business type
+   */
+  async updateBusinessType(
+    updateDto: UpdateBusinessTypeDto,
+  ): Promise<Setting> {
+    let setting: Setting;
+
+    try {
+      setting = await this.findByKey('business_type');
+    } catch (error) {
+      // Create the setting if it doesn't exist
+      setting = this.settingsRepository.create({
+        key: 'business_type',
+        value: updateDto.businessType,
+        dataType: SettingDataType.STRING,
+        category: SettingCategory.BUSINESS,
+        label: 'Business Type',
+        description: 'Type of business: retail, restaurant, or hybrid',
+        businessType: updateDto.businessType,
+      });
+      return this.settingsRepository.save(setting);
+    }
+
+    setting.value = updateDto.businessType;
+    setting.businessType = updateDto.businessType;
+
+    // If switching to restaurant or hybrid, enable restaurant mode
+    if (
+      updateDto.businessType === BusinessType.RESTAURANT ||
+      updateDto.businessType === BusinessType.HYBRID
+    ) {
+      await this.enableRestaurantMode();
+    }
+
+    return this.settingsRepository.save(setting);
+  }
+
+  /**
+   * Check if restaurant mode is enabled
+   */
+  async isRestaurantModeEnabled(): Promise<boolean> {
+    try {
+      const setting = await this.findByKey('restaurant_mode_enabled');
+      return setting.value === 'true';
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Enable restaurant mode
+   */
+  async enableRestaurantMode(): Promise<void> {
+    let setting: Setting;
+
+    try {
+      setting = await this.findByKey('restaurant_mode_enabled');
+      setting.value = 'true';
+    } catch (error) {
+      setting = this.settingsRepository.create({
+        key: 'restaurant_mode_enabled',
+        value: 'true',
+        dataType: SettingDataType.BOOLEAN,
+        category: SettingCategory.RESTAURANT,
+        label: 'Restaurant Mode Enabled',
+        description: 'Enable restaurant-specific features',
+      });
+    }
+
+    await this.settingsRepository.save(setting);
+  }
+
+  /**
+   * Disable restaurant mode
+   */
+  async disableRestaurantMode(): Promise<void> {
+    try {
+      const setting = await this.findByKey('restaurant_mode_enabled');
+      setting.value = 'false';
+      await this.settingsRepository.save(setting);
+    } catch (error) {
+      // Setting doesn't exist, nothing to disable
+    }
+  }
+
+  /**
+   * Get restaurant settings
+   */
+  async getRestaurantSettings(): Promise<RestaurantSettingsDto> {
+    const settings = await this.findAll();
+    const settingWithRestaurantConfig = settings.find(
+      (s) => s.restaurantSettings != null,
+    );
+
+    if (!settingWithRestaurantConfig?.restaurantSettings) {
+      // Return default settings if not configured
+      return DEFAULT_RESTAURANT_SETTINGS as RestaurantSettingsDto;
+    }
+
+    return settingWithRestaurantConfig.restaurantSettings as RestaurantSettingsDto;
+  }
+
+  /**
+   * Update restaurant settings
+   */
+  async updateRestaurantSettings(
+    updateDto: UpdateRestaurantSettingsDto,
+  ): Promise<Setting> {
+    // Find the business type setting or create one
+    let setting: Setting;
+
+    try {
+      setting = await this.findByKey('business_type');
+    } catch (error) {
+      // Create a new setting for restaurant configuration
+      setting = this.settingsRepository.create({
+        key: 'restaurant_configuration',
+        value: JSON.stringify(updateDto.restaurantSettings),
+        dataType: SettingDataType.JSON,
+        category: SettingCategory.RESTAURANT,
+        label: 'Restaurant Configuration',
+        description: 'Restaurant-specific settings and features',
+        restaurantSettings: updateDto.restaurantSettings,
+      });
+      return this.settingsRepository.save(setting);
+    }
+
+    // Update the restaurant settings
+    setting.restaurantSettings = updateDto.restaurantSettings;
+    return this.settingsRepository.save(setting);
+  }
+
+  /**
+   * Get complete restaurant configuration
+   */
+  async getRestaurantConfiguration(): Promise<RestaurantConfigurationDto> {
+    const businessType = await this.getBusinessType();
+    const restaurantModeEnabled = await this.isRestaurantModeEnabled();
+    const restaurantSettings = await this.getRestaurantSettings();
+
+    // Determine available features based on settings
+    const availableFeatures: string[] = [];
+
+    if (restaurantSettings.tableManagement?.enabled) {
+      availableFeatures.push('table_management');
+    }
+    if (restaurantSettings.kitchenDisplay?.enabled) {
+      availableFeatures.push('kitchen_display');
+    }
+    if (restaurantSettings.delivery?.enabled) {
+      availableFeatures.push('delivery_management');
+    }
+    if (restaurantSettings.reservations?.enabled) {
+      availableFeatures.push('reservations');
+    }
+    if (restaurantSettings.orderingFlow?.allowSplitBills) {
+      availableFeatures.push('split_bills');
+    }
+    if (restaurantSettings.orderingFlow?.allowCourseTiming) {
+      availableFeatures.push('course_timing');
+    }
+    if (restaurantSettings.tableManagement?.qrMenuEnabled) {
+      availableFeatures.push('menu_qr_code');
+    }
+
+    return {
+      businessType,
+      restaurantModeEnabled,
+      restaurantSettings,
+      availableFeatures,
+    };
+  }
+
+  /**
+   * Initialize restaurant settings with defaults
+   */
+  async initializeRestaurantSettings(): Promise<void> {
+    const businessType = await this.getBusinessType();
+
+    // Only initialize for restaurant or hybrid businesses
+    if (
+      businessType === BusinessType.RESTAURANT ||
+      businessType === BusinessType.HYBRID
+    ) {
+      try {
+        const currentSettings = await this.getRestaurantSettings();
+
+        // If settings are already configured, don't overwrite
+        if (JSON.stringify(currentSettings) !== JSON.stringify(DEFAULT_RESTAURANT_SETTINGS)) {
+          return;
+        }
+      } catch (error) {
+        // Settings don't exist, will create them
+      }
+
+      await this.updateRestaurantSettings({
+        restaurantSettings: DEFAULT_RESTAURANT_SETTINGS as RestaurantSettingsDto,
+      });
     }
   }
 }
