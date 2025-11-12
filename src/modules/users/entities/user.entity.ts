@@ -94,6 +94,25 @@ export class User {
     schedule?: any;
   };
 
+  // Server-specific fields
+  @Column({ type: 'boolean', default: false })
+  isServer: boolean;
+
+  @Column({ unique: true, nullable: true })
+  serverCode: string; // Unique server identifier (e.g., S001, S002)
+
+  @Column({ type: 'jsonb', nullable: true })
+  serverProfile: {
+    rating?: number; // Average server rating (0-5)
+    totalOrders?: number; // Lifetime orders served
+    totalSales?: number; // Lifetime sales amount
+    totalTips?: number; // Lifetime tips earned
+    averageTipPercentage?: number; // Average tip percentage
+    preferredSections?: string[]; // Preferred section IDs
+    certifications?: string[]; // Server certifications
+    specialties?: string[]; // Server specialties (e.g., wine service, desserts)
+  };
+
   @Column({ type: 'timestamp', nullable: true })
   lastLogin: Date;
 

@@ -8,6 +8,7 @@ import { seedCategories } from './6-categories.seed';
 import { seedProducts } from './7-products.seed';
 import { seedCustomers } from './8-customers.seed';
 import { seedSettings } from './9-settings.seed';
+import { seedServerManagement } from './10-server-management.seed';
 
 async function runSeeds() {
   console.log('🌱 Starting database seeding...\n');
@@ -52,6 +53,10 @@ async function runSeeds() {
 
     console.log('⚙️  Seeding Settings...');
     await seedSettings(AppDataSource);
+    console.log('');
+
+    console.log('🍽️  Seeding Server Management...');
+    await seedServerManagement(AppDataSource);
     console.log('');
 
     console.log('✅ Database seeding completed successfully!\n');

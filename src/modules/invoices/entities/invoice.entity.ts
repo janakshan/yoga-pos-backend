@@ -59,6 +59,20 @@ export class Invoice {
   @Column({ name: 'created_by' })
   createdById: string;
 
+  // Server tracking
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'server_id' })
+  server: User;
+
+  @Column({ name: 'server_id', nullable: true })
+  serverId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  tableNumber: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  sectionName: string;
+
   @OneToMany(() => InvoiceItem, (item) => item.invoice, {
     cascade: true,
     eager: true,

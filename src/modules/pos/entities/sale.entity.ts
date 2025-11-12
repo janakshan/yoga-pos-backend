@@ -55,6 +55,20 @@ export class Sale {
   @Column({ name: 'branch_id' })
   branchId: string;
 
+  // Server tracking
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'server_id' })
+  server: User;
+
+  @Column({ name: 'server_id', nullable: true })
+  serverId: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  tableNumber: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  sectionName: string;
+
   @OneToMany(() => SaleItem, (item) => item.sale, {
     cascade: true,
     eager: true,
