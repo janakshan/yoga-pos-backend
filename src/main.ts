@@ -87,9 +87,10 @@ async function bootstrap() {
   });
 
   const port = configService.get('app.port');
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
   console.log(`\n🚀 Application is running on: http://localhost:${port}/${apiPrefix}`);
+  console.log(`🌐 Network access: http://192.168.1.47:${port}/${apiPrefix}`);
   console.log(`📚 Swagger documentation: http://localhost:${port}/${apiPrefix}/docs\n`);
 }
 
