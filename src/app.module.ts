@@ -33,6 +33,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { ExportModule } from './modules/export/export.module';
 import { RestaurantModule } from './modules/restaurant/restaurant.module';
 import { RecipesModule } from './modules/recipes/recipes.module';
+import { ServerManagementModule } from './modules/server-management/server-management.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { RecipesModule } from './modules/recipes/recipes.module';
     ExportModule,
     RestaurantModule,
     RecipesModule,
+    ServerManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],
