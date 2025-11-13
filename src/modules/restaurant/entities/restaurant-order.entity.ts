@@ -48,6 +48,13 @@ export class RestaurantOrder {
   @Column({ name: 'table_id', nullable: true })
   tableId: string;
 
+  @ManyToOne(() => import('./qr-order-session.entity').QROrderSession, { nullable: true })
+  @JoinColumn({ name: 'qr_session_id' })
+  qrSession: any; // Will be QROrderSession type
+
+  @Column({ name: 'qr_session_id', nullable: true })
+  qrSessionId: string;
+
   @ManyToOne(() => Customer, { nullable: true })
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
