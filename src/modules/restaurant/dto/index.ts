@@ -24,3 +24,6 @@ export * from './update-order-item.dto';
 export * from './filter-order.dto';
 export * from './add-order-items.dto';
 export * from './remove-order-items.dto';
+
+// Kitchen Display System DTOs
+export * from './kitchen.dto';
