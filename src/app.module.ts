@@ -31,6 +31,7 @@ import { SettingsModule } from './modules/settings/settings.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { ExportModule } from './modules/export/export.module';
+import { RestaurantModule } from './modules/restaurant/restaurant.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { ExportModule } from './modules/export/export.module';
     ReportsModule,
     AnalyticsModule,
     ExportModule,
+    RestaurantModule,
   ],
   controllers: [AppController],
   providers: [AppService],

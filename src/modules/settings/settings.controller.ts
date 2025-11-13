@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Put,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,6 +22,11 @@ import { CreateSettingDto } from './dto/create-setting.dto';
 import { UpdateSettingDto } from './dto/update-setting.dto';
 import { UpdateSettingValueDto } from './dto/update-setting-value.dto';
 import { BulkUpdateSettingsDto } from './dto/bulk-update-settings.dto';
+import {
+  UpdateBusinessTypeDto,
+  UpdateRestaurantSettingsDto,
+  RestaurantConfigurationDto,
+} from './dto/restaurant-settings.dto';
 import { SettingCategory } from './entities/setting.entity';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -207,5 +213,150 @@ export class SettingsController {
   async initializeDefaults() {
     await this.settingsService.initializeDefaults();
     return { message: 'Default settings initialized successfully' };
+  }
+
+  // ============================================================================
+  // Restaurant Mode Endpoints
+  // ============================================================================
+
+  @Get('restaurant/configuration')
+  @Roles('admin', 'manager', 'staff')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Get restaurant configuration',
+    description: 'Get complete restaurant mode configuration including business type, enabled features, and settings',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Restaurant configuration retrieved successfully',
+    type: RestaurantConfigurationDto,
+  })
+  getRestaurantConfiguration() {
+    return this.settingsService.getRestaurantConfiguration();
+  }
+
+  @Get('restaurant/business-type')
+  @Roles('admin', 'manager', 'staff')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Get business type',
+    description: 'Get the current business type (retail, restaurant, or hybrid)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Business type retrieved successfully',
+  })
+  async getBusinessType() {
+    const businessType = await this.settingsService.getBusinessType();
+    return { businessType };
+  }
+
+  @Put('restaurant/business-type')
+  @Roles('admin')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Update business type',
+    description: 'Update the business type. Setting to restaurant or hybrid will automatically enable restaurant mode.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Business type updated successfully',
+  })
+  updateBusinessType(@Body() updateDto: UpdateBusinessTypeDto) {
+    return this.settingsService.updateBusinessType(updateDto);
+  }
+
+  @Get('restaurant/enabled')
+  @Roles('admin', 'manager', 'staff')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Check if restaurant mode is enabled',
+    description: 'Check whether restaurant mode is currently enabled',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Restaurant mode status retrieved successfully',
+  })
+  async isRestaurantModeEnabled() {
+    const enabled = await this.settingsService.isRestaurantModeEnabled();
+    return { enabled };
+  }
+
+  @Post('restaurant/enable')
+  @Roles('admin')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Enable restaurant mode',
+    description: 'Enable restaurant-specific features',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Restaurant mode enabled successfully',
+  })
+  async enableRestaurantMode() {
+    await this.settingsService.enableRestaurantMode();
+    return { message: 'Restaurant mode enabled successfully' };
+  }
+
+  @Post('restaurant/disable')
+  @Roles('admin')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Disable restaurant mode',
+    description: 'Disable restaurant-specific features',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Restaurant mode disabled successfully',
+  })
+  async disableRestaurantMode() {
+    await this.settingsService.disableRestaurantMode();
+    return { message: 'Restaurant mode disabled successfully' };
+  }
+
+  @Get('restaurant/settings')
+  @Roles('admin', 'manager', 'staff')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Get restaurant settings',
+    description: 'Get detailed restaurant settings including table management, kitchen display, etc.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Restaurant settings retrieved successfully',
+  })
+  getRestaurantSettings() {
+    return this.settingsService.getRestaurantSettings();
+  }
+
+  @Put('restaurant/settings')
+  @Roles('admin')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Update restaurant settings',
+    description: 'Update restaurant-specific settings and feature configuration',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Restaurant settings updated successfully',
+  })
+  updateRestaurantSettings(@Body() updateDto: UpdateRestaurantSettingsDto) {
+    return this.settingsService.updateRestaurantSettings(updateDto);
+  }
+
+  @Post('restaurant/initialize')
+  @Roles('admin')
+  @ApiTags('Restaurant Mode')
+  @ApiOperation({
+    summary: 'Initialize restaurant settings',
+    description: 'Initialize restaurant settings with default values',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Restaurant settings initialized successfully',
+  })
+  async initializeRestaurantSettings() {
+    await this.settingsService.initializeRestaurantSettings();
+    return { message: 'Restaurant settings initialized successfully' };
   }
 }
