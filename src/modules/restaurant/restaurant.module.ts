@@ -21,6 +21,7 @@ import { RestaurantOrder } from './entities/restaurant-order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { TableQRCode } from './entities/table-qr-code.entity';
 import { QROrderSession } from './entities/qr-order-session.entity';
+import { KitchenStation } from './entities/kitchen-station.entity';
 
 // Services
 import {
@@ -28,10 +29,12 @@ import {
   FloorPlanService,
   TableSectionService,
   RestaurantOrdersService,
+  KitchenService,
 } from './services';
 import { QrCodeService } from './services/qr-code.service';
 import { QrOrderingService } from './services/qr-ordering.service';
 import { QrSessionCleanupService } from './services/qr-session-cleanup.service';
+import { KitchenPrinterService } from './services/kitchen-printer.service';
 
 // Controllers
 import {
@@ -39,6 +42,7 @@ import {
   FloorPlanController,
   TableSectionController,
   RestaurantOrdersController,
+  KitchenController,
 } from './controllers';
 import { QrOrderingController } from './controllers/qr-ordering.controller';
 import { PublicMenuController } from './controllers/public-menu.controller';
@@ -46,6 +50,7 @@ import { PublicMenuController } from './controllers/public-menu.controller';
 // Gateways
 import { RestaurantOrdersGateway } from './gateways/restaurant-orders.gateway';
 import { QrGuestGateway } from './gateways/qr-guest.gateway';
+import { KitchenGateway } from './gateways/kitchen.gateway';
 
 /**
  * Restaurant Module
@@ -119,6 +124,7 @@ import { QrGuestGateway } from './gateways/qr-guest.gateway';
       OrderItem,
       TableQRCode,
       QROrderSession,
+      KitchenStation,
       Product,
       Category,
       ModifierGroup,
@@ -156,6 +162,7 @@ import { QrGuestGateway } from './gateways/qr-guest.gateway';
     RestaurantOrdersController,
     QrOrderingController,
     PublicMenuController,
+    KitchenController,
   ],
   providers: [
     TablesService,
@@ -165,8 +172,11 @@ import { QrGuestGateway } from './gateways/qr-guest.gateway';
     QrCodeService,
     QrOrderingService,
     QrSessionCleanupService,
+    KitchenService,
+    KitchenPrinterService,
     RestaurantOrdersGateway,
     QrGuestGateway,
+    KitchenGateway,
   ],
   exports: [
     TablesService,
@@ -175,6 +185,8 @@ import { QrGuestGateway } from './gateways/qr-guest.gateway';
     RestaurantOrdersService,
     QrCodeService,
     QrOrderingService,
+    KitchenService,
+    KitchenPrinterService,
   ],
 })
 export class RestaurantModule {}
