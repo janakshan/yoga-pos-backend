@@ -71,6 +71,31 @@ export enum ModifierType {
 }
 
 /**
+ * Kitchen stations for order routing
+ */
+export enum KitchenStation {
+  GRILL = 'grill',
+  FRYER = 'fryer',
+  SALAD = 'salad',
+  DESSERT = 'dessert',
+  BAR = 'bar',
+  HOT_KITCHEN = 'hot_kitchen',
+  COLD_KITCHEN = 'cold_kitchen',
+  PASTRY = 'pastry',
+  GENERAL = 'general',
+}
+
+/**
+ * Payment status for orders
+ */
+export enum OrderPaymentStatus {
+  UNPAID = 'unpaid',
+  PARTIAL = 'partial',
+  PAID = 'paid',
+  REFUNDED = 'refunded',
+}
+
+/**
  * Restaurant feature flags
  */
 export enum RestaurantFeature {
@@ -310,3 +335,32 @@ export const RESTAURANT_PERMISSIONS = {
  */
 export const RESTAURANT_MODE_KEY = 'restaurant_mode';
 export const RESTAURANT_FEATURE_KEY = 'restaurant_feature';
+
+/**
+ * Order status state machine - defines valid status transitions
+ * Maps current status to array of allowed next statuses
+ */
+export const ORDER_STATUS_TRANSITIONS: Record<
+  RestaurantOrderStatus,
+  RestaurantOrderStatus[]
+> = {
+  [RestaurantOrderStatus.PENDING]: [
+    RestaurantOrderStatus.CONFIRMED,
+    RestaurantOrderStatus.CANCELLED,
+  ],
+  [RestaurantOrderStatus.CONFIRMED]: [
+    RestaurantOrderStatus.PREPARING,
+    RestaurantOrderStatus.CANCELLED,
+  ],
+  [RestaurantOrderStatus.PREPARING]: [
+    RestaurantOrderStatus.READY,
+    RestaurantOrderStatus.CANCELLED,
+  ],
+  [RestaurantOrderStatus.READY]: [
+    RestaurantOrderStatus.SERVED,
+    RestaurantOrderStatus.CANCELLED,
+  ],
+  [RestaurantOrderStatus.SERVED]: [RestaurantOrderStatus.COMPLETED],
+  [RestaurantOrderStatus.COMPLETED]: [], // Terminal state - no transitions allowed
+  [RestaurantOrderStatus.CANCELLED]: [], // Terminal state - no transitions allowed
+};
