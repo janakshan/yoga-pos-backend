@@ -27,3 +27,11 @@ export * from './remove-order-items.dto';
 
 // Kitchen Display System DTOs
 export * from './kitchen.dto';
+
+// Tip DTOs
+export * from './calculate-tip.dto';
+export * from './tip-configuration.dto';
+export * from './distribute-tips.dto';
+
+// Split Payment DTOs
+export * from './split-payment.dto';

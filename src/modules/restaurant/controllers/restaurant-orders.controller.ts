@@ -262,4 +262,47 @@ export class RestaurantOrdersController {
     const userName = req.user?.username || 'System';
     return this.ordersService.remove(id, reason, userId, userName);
   }
+
+  @Post(':id/reorder')
+  @ApiOperation({
+    summary: 'Reorder',
+    description: 'Create a new order based on a previous order',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Order reordered successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Original order not found' })
+  @ApiParam({ name: 'id', description: 'Original Order ID' })
+  @ApiBody({
+    required: false,
+    schema: {
+      type: 'object',
+      properties: {
+        serverId: {
+          type: 'string',
+          description: 'Server ID (optional - will use original if not provided)',
+        },
+        tableId: {
+          type: 'string',
+          description: 'Table ID (optional - will use original if not provided)',
+        },
+        serviceType: {
+          type: 'string',
+          enum: ['dine_in', 'takeaway', 'delivery'],
+          description: 'Service type (optional - will use original if not provided)',
+        },
+        notes: {
+          type: 'string',
+          description: 'Additional notes for reorder',
+        },
+      },
+    },
+  })
+  reorder(
+    @Param('id') id: string,
+    @Body() partialOrderDto: Partial<CreateOrderDto>,
+  ) {
+    return this.ordersService.reorder(id, partialOrderDto);
+  }
 }

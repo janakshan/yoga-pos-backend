@@ -975,4 +975,61 @@ export class RestaurantOrdersService {
       userName,
     );
   }
+
+  /**
+   * Reorder - Create a new order based on a previous order
+   */
+  async reorder(
+    originalOrderId: string,
+    createOrderDto: Partial<CreateOrderDto>,
+  ): Promise<RestaurantOrder> {
+    // Get the original order with all items
+    const originalOrder = await this.findOne(originalOrderId);
+
+    if (!originalOrder) {
+      throw new NotFoundException('Original order not found');
+    }
+
+    // Create new order DTO based on original order
+    const newOrderDto: CreateOrderDto = {
+      branchId: createOrderDto.branchId || originalOrder.branchId,
+      serviceType: createOrderDto.serviceType || originalOrder.serviceType,
+      serverId: createOrderDto.serverId || originalOrder.serverId,
+      tableId: createOrderDto.tableId || originalOrder.tableId,
+      customerId: createOrderDto.customerId || originalOrder.customerId,
+      priority: createOrderDto.priority || originalOrder.priority,
+      guestCount: createOrderDto.guestCount || originalOrder.guestCount,
+      specialInstructions:
+        createOrderDto.specialInstructions ||
+        originalOrder.specialInstructions,
+      notes: createOrderDto.notes || `Reorder of ${originalOrder.orderNumber}`,
+      discount: createOrderDto.discount || Number(originalOrder.discount),
+      deliveryAddress:
+        createOrderDto.deliveryAddress || originalOrder.deliveryAddress,
+      deliveryPhone:
+        createOrderDto.deliveryPhone || originalOrder.deliveryPhone,
+      deliveryFee: createOrderDto.deliveryFee || Number(originalOrder.deliveryFee),
+      items: originalOrder.items.map((item) => ({
+        productId: item.productId,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice),
+        kitchenStation: item.kitchenStation,
+        course: item.course,
+        specialInstructions: item.specialInstructions,
+        notes: item.notes,
+        modifiers: item.modifiers,
+        isCombo: item.isCombo,
+        comboGroupId: item.comboGroupId,
+        seatNumber: item.seatNumber,
+      })),
+      metadata: {
+        ...createOrderDto.metadata,
+        reorderedFrom: originalOrderId,
+        originalOrderNumber: originalOrder.orderNumber,
+      },
+    };
+
+    // Create the new order
+    return this.create(newOrderDto);
+  }
 }

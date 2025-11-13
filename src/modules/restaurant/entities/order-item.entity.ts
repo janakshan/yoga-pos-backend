@@ -90,6 +90,9 @@ export class OrderItem {
   @Column({ type: 'text', nullable: true, name: 'special_instructions' })
   specialInstructions: string;
 
+  @Column({ type: 'int', nullable: true, name: 'seat_number' })
+  seatNumber: number; // Seat assignment for multi-guest orders
+
   // Modifiers and customizations
   @Column({ type: 'jsonb', nullable: true })
   modifiers: Array<{

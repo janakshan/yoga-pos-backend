@@ -121,6 +121,21 @@ export class RestaurantOrder {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, name: 'amount_paid' })
   amountPaid: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0, name: 'tip_amount' })
+  tipAmount: number;
+
+  @Column({ type: 'decimal', precision: 5, scale: 2, nullable: true, name: 'tip_percentage' })
+  tipPercentage: number | null;
+
+  @Column({
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+    name: 'tip_method',
+    comment: 'How tip was calculated: percentage, fixed, custom, none'
+  })
+  tipMethod: 'percentage' | 'fixed' | 'custom' | 'none';
+
   // Additional fields
   @Column({ type: 'text', nullable: true, name: 'special_instructions' })
   specialInstructions: string;
