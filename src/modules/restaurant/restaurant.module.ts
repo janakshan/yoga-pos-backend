@@ -5,6 +5,7 @@ import { BranchesModule } from '../branches/branches.module';
 import { UsersModule } from '../users/users.module';
 import { CustomersModule } from '../customers/customers.module';
 import { ProductsModule } from '../products/products.module';
+import { ModifiersModule } from './modifiers/modifiers.module';
 
 // Entities
 import { Table } from './entities/table.entity';
@@ -43,8 +44,10 @@ import { RestaurantOrdersGateway } from './gateways/restaurant-orders.gateway';
  * - Order status workflow and state machine (Phase 3 - Implemented)
  * - Kitchen station routing (Phase 3 - Implemented)
  * - Order modification and audit logging (Phase 3 - Implemented)
- * - Kitchen display system (Phase 2 - Planned)
- * - Menu management with modifiers (Phase 2 - Planned)
+ * - Menu management with modifiers (Phase 2 - Implemented)
+ * - Modifier pricing calculation (Phase 2 - Implemented)
+ * - Menu availability rules engine (Phase 2 - Implemented)
+ * - Kitchen display system (Phase 4 - Planned)
  * - Real-time order updates via WebSocket (Phase 3 - In Progress)
  * - Reservations (Phase 4 - Planned)
  * - Waiter app functionality (Phase 4 - Planned)
@@ -54,6 +57,18 @@ import { RestaurantOrdersGateway } from './gateways/restaurant-orders.gateway';
  * - Table status management
  * - Server assignment to tables
  * - Table availability checking
+ *
+ * Phase 2: Menu Management & Modifiers ✅
+ * - Complete CRUD operations for modifiers and modifier groups
+ * - Product-to-modifier-group relationships
+ * - Enhanced Product entity with restaurant-specific fields
+ * - Modifier pricing calculation (fixed and percentage)
+ * - Modifier validation (min/max selections, required/optional)
+ * - Time-based and day-based availability rules
+ * - Conditional display rules for modifiers
+ * - Free modifier counts and charging logic
+ * - Inventory tracking for modifiers
+ * - Bulk operations for modifier availability and stock
  *
  * Phase 3: Order Management ✅
  * - Order creation with table validation
@@ -78,6 +93,7 @@ import { RestaurantOrdersGateway } from './gateways/restaurant-orders.gateway';
     UsersModule,
     CustomersModule,
     ProductsModule,
+    ModifiersModule,
   ],
   controllers: [
     TablesController,
