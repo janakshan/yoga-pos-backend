@@ -7,6 +7,7 @@ import {
   IsUUID,
   IsEnum,
   IsArray,
+  IsInt,
   ValidateNested,
   Min,
 } from 'class-validator';
@@ -136,4 +137,13 @@ export class CreateOrderItemDto {
   @IsString()
   @IsOptional()
   comboGroupId?: string;
+
+  @ApiPropertyOptional({
+    example: 1,
+    description: 'Seat number for multi-guest orders',
+  })
+  @IsInt()
+  @IsOptional()
+  @Min(1)
+  seatNumber?: number;
 }

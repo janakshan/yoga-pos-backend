@@ -139,4 +139,31 @@ export class CreateOrderDto {
   })
   @IsOptional()
   metadata?: Record<string, any>;
+
+  // Tip fields
+  @ApiPropertyOptional({
+    example: 15.00,
+    description: 'Tip amount',
+  })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  tipAmount?: number;
+
+  @ApiPropertyOptional({
+    example: 15,
+    description: 'Tip percentage (0-100)',
+  })
+  @IsNumber()
+  @IsOptional()
+  @Min(0)
+  tipPercentage?: number;
+
+  @ApiPropertyOptional({
+    example: 'percentage',
+    description: 'Tip calculation method: percentage, fixed, custom, none',
+  })
+  @IsString()
+  @IsOptional()
+  tipMethod?: 'percentage' | 'fixed' | 'custom' | 'none';
 }

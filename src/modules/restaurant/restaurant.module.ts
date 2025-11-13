@@ -12,6 +12,7 @@ import { ModifiersModule } from './modifiers/modifiers.module';
 import { ModifierGroup } from './modifiers/entities/modifier-group.entity';
 import { Product } from '../products/entities/product.entity';
 import { Category } from '../products/entities/category.entity';
+import { Payment } from '../payments/entities/payment.entity';
 
 // Entities
 import { Table } from './entities/table.entity';
@@ -35,6 +36,9 @@ import { QrCodeService } from './services/qr-code.service';
 import { QrOrderingService } from './services/qr-ordering.service';
 import { QrSessionCleanupService } from './services/qr-session-cleanup.service';
 import { KitchenPrinterService } from './services/kitchen-printer.service';
+import { TipService } from './services/tip.service';
+import { SplitPaymentService } from './services/split-payment.service';
+import { ServerPerformanceService } from './services/server-performance.service';
 
 // Controllers
 import {
@@ -46,6 +50,9 @@ import {
 } from './controllers';
 import { QrOrderingController } from './controllers/qr-ordering.controller';
 import { PublicMenuController } from './controllers/public-menu.controller';
+import { TipController } from './controllers/tip.controller';
+import { SplitPaymentController } from './controllers/split-payment.controller';
+import { ServerPerformanceController } from './controllers/server-performance.controller';
 
 // Gateways
 import { RestaurantOrdersGateway } from './gateways/restaurant-orders.gateway';
@@ -128,6 +135,7 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
       Product,
       Category,
       ModifierGroup,
+      Payment,
     ]),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([
@@ -163,6 +171,9 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
     QrOrderingController,
     PublicMenuController,
     KitchenController,
+    TipController,
+    SplitPaymentController,
+    ServerPerformanceController,
   ],
   providers: [
     TablesService,
@@ -174,6 +185,9 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
     QrSessionCleanupService,
     KitchenService,
     KitchenPrinterService,
+    TipService,
+    SplitPaymentService,
+    ServerPerformanceService,
     RestaurantOrdersGateway,
     QrGuestGateway,
     KitchenGateway,
@@ -187,6 +201,9 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
     QrOrderingService,
     KitchenService,
     KitchenPrinterService,
+    TipService,
+    SplitPaymentService,
+    ServerPerformanceService,
   ],
 })
 export class RestaurantModule {}
