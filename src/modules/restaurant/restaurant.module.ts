@@ -23,6 +23,9 @@ import { OrderItem } from './entities/order-item.entity';
 import { TableQRCode } from './entities/table-qr-code.entity';
 import { QROrderSession } from './entities/qr-order-session.entity';
 import { KitchenStation } from './entities/kitchen-station.entity';
+import { PrinterJob } from './entities/printer-job.entity';
+import { PrinterConfig } from './entities/printer-config.entity';
+import { NotificationLog } from './entities/notification-log.entity';
 
 // Services
 import {
@@ -39,6 +42,11 @@ import { KitchenPrinterService } from './services/kitchen-printer.service';
 import { TipService } from './services/tip.service';
 import { SplitPaymentService } from './services/split-payment.service';
 import { ServerPerformanceService } from './services/server-performance.service';
+import { PrinterQueueService } from './services/printer-queue.service';
+import { PrinterRoutingService } from './services/printer-routing.service';
+import { PrinterStatusService } from './services/printer-status.service';
+import { CustomerDisplayService } from './services/customer-display.service';
+import { NotificationService } from './services/notification.service';
 
 // Controllers
 import {
@@ -53,6 +61,7 @@ import { PublicMenuController } from './controllers/public-menu.controller';
 import { TipController } from './controllers/tip.controller';
 import { SplitPaymentController } from './controllers/split-payment.controller';
 import { ServerPerformanceController } from './controllers/server-performance.controller';
+import { HardwareController } from './controllers/hardware.controller';
 
 // Gateways
 import { RestaurantOrdersGateway } from './gateways/restaurant-orders.gateway';
@@ -132,6 +141,9 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
       TableQRCode,
       QROrderSession,
       KitchenStation,
+      PrinterJob,
+      PrinterConfig,
+      NotificationLog,
       Product,
       Category,
       ModifierGroup,
@@ -174,6 +186,7 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
     TipController,
     SplitPaymentController,
     ServerPerformanceController,
+    HardwareController,
   ],
   providers: [
     TablesService,
@@ -188,6 +201,11 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
     TipService,
     SplitPaymentService,
     ServerPerformanceService,
+    PrinterQueueService,
+    PrinterRoutingService,
+    PrinterStatusService,
+    CustomerDisplayService,
+    NotificationService,
     RestaurantOrdersGateway,
     QrGuestGateway,
     KitchenGateway,
@@ -204,6 +222,11 @@ import { KitchenGateway } from './gateways/kitchen.gateway';
     TipService,
     SplitPaymentService,
     ServerPerformanceService,
+    PrinterQueueService,
+    PrinterRoutingService,
+    PrinterStatusService,
+    CustomerDisplayService,
+    NotificationService,
   ],
 })
 export class RestaurantModule {}
