@@ -92,6 +92,24 @@ export class User {
     hireDate?: Date;
     salary?: number;
     schedule?: any;
+    // Server-specific fields
+    isServer?: boolean;
+    serverLevel?: 'trainee' | 'junior' | 'intermediate' | 'senior' | 'lead';
+    certifications?: string[];
+    specialties?: string[]; // e.g., wine service, fine dining, etc.
+    maxTableCapacity?: number;
+    preferredSections?: string[];
+    availableShifts?: string[];
+    tipPoolParticipation?: boolean;
+    tipOutPercentages?: {
+      busser?: number;
+      host?: number;
+      bartender?: number;
+      kitchen?: number;
+    };
+    performanceRating?: number; // 1-5 scale
+    trainingStatus?: string;
+    mentorId?: string; // ID of mentor for trainees
   };
 
   @Column({ type: 'timestamp', nullable: true })

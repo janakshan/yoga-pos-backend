@@ -74,6 +74,10 @@ async function bootstrap() {
     .addTag('Notifications', 'Notification system')
     .addTag('Backup', 'Backup and recovery')
     .addTag('Settings', 'Application settings')
+    .addTag('Server Management - Assignments', 'Server section assignment management')
+    .addTag('Server Management - Shifts', 'Server shift and time tracking')
+    .addTag('Server Management - Performance', 'Server performance metrics and reporting')
+    .addTag('Server Management - Tip Distribution', 'Tip tracking and pooling management')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
